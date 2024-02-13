@@ -15,4 +15,9 @@ app.use(express.urlencoded({extended: true, limit: '16kb' }))
 app.use(express.static("public"))
 
 app.use(cookieParser()) // allows access for server to perform CRUD operations in the browser's cookie
+
+import userRouter from './routes/user.routes.js';
+
+app.use('/api/v1/users', userRouter);
+
 export { app };
