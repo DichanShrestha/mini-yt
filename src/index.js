@@ -16,7 +16,7 @@ import { app } from './app.js'
 //         console.error("ERROR: ", error);
 //     }
 // })()
-dotenv.config({ path: './env' });
+dotenv.config({ path: './.env' });
 
 connectDB()
     .then(() => {
