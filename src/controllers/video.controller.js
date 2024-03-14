@@ -15,7 +15,47 @@ const getAllVideos = asyncHandler(async (req, res) => {
 const publishAVideo = asyncHandler(async (req, res) => {
     const { title, description} = req.body
     // TODO: get video, upload to cloudinary, create video
+    const videoFileLocalPath = req.files?.videoFile[0]?.path;
+    const thumbnailLocalPath = req.files?.thumbnail[0]?.path;
+
+    const videoFile = await uploadOnCloudinary(videoFileLocalPath)
+    const thumbnail = await uploadOnCloudinary(thumbnailLocalPath)
+
+    if (!videoFile || !thumbnail) {
+        throw new ApiError(404, "Thumbnail and Video are necessary")
+    }
+    const video = await Video.create({
+        videoFile: videoFile.url,
+        thumbnail: thumbnail.url,
+        title,
+        description,
+        duration: videoFile?.duration || 0,
+        owner: req.user._id,
+        isPublished: true,
+        views: 0
+    })
+    return res
+    .status(200)
+    .json(new ApiResponse(200, video, "Video added successfully"))
+
 })
+
+const incrementViewCount = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+    const updatedVideo = await Video.findByIdAndUpdate(
+        videoId,
+        { $inc: { views: 1 } },
+        { new: true } 
+    );
+
+    if (!updatedVideo) {
+        throw new ApiError(404, "Video not found");
+    }
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, updatedVideo, "View count incremented successfully"));
+});
 
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
@@ -30,6 +70,15 @@ const updateVideo = asyncHandler(async (req, res) => {
 
 const deleteVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
+    const isVideoDeleted = await Video.findByIdAndDelete(videoId);
+
+    if (!isVideoDeleted) {
+        throw new ApiError(500, "Video failed to delete due to server issue")
+    }
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Video deleted successfully"))
     //TODO: delete video
 })
 
@@ -43,5 +92,6 @@ export {
     getVideoById,
     updateVideo,
     deleteVideo,
-    togglePublishStatus
+    togglePublishStatus,
+    incrementViewCount
 }
