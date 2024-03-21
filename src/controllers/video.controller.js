@@ -1,10 +1,14 @@
-import mongoose, {isValidObjectId} from "mongoose"
-import {Video} from "../models/video.model.js"
-import {User} from "../models/user.model.js"
-import {ApiError} from "../utils/ApiError.js"
-import {ApiResponse} from "../utils/ApiResponse.js"
-import {asyncHandler} from "../utils/asyncHandler.js"
-import {uploadOnCloudinary} from "../utils/cloudinary.js"
+import mongoose, { isValidObjectId } from "mongoose"
+import { Video } from "../models/video.model.js"
+import { User } from "../models/user.model.js"
+import { ApiError } from "../utils/ApiError.js"
+import { ApiResponse } from "../utils/ApiResponse.js"
+import { asyncHandler } from "../utils/asyncHandler.js"
+import {
+    uploadOnCloudinary,
+    deleteFromFs,
+    deleteThumbnailFromCloudinary
+} from "../utils/cloudinary.js"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
@@ -13,7 +17,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
 })
 
 const publishAVideo = asyncHandler(async (req, res) => {
-    const { title, description} = req.body
+    const { title, description } = req.body
     // TODO: get video, upload to cloudinary, create video
     const videoFileLocalPath = req.files?.videoFile[0]?.path;
     const thumbnailLocalPath = req.files?.thumbnail[0]?.path;
@@ -26,17 +30,19 @@ const publishAVideo = asyncHandler(async (req, res) => {
     }
     const video = await Video.create({
         videoFile: videoFile.url,
+        videoPublicId: videoFile.public_id,
         thumbnail: thumbnail.url,
+        thumbnailPublicId: thumbnail.public_id,
         title,
         description,
         duration: videoFile?.duration || 0,
         owner: req.user._id,
-        isPublished: true,
+        isPublished: false,
         views: 0
     })
     return res
-    .status(200)
-    .json(new ApiResponse(200, video, "Video added successfully"))
+        .status(200)
+        .json(new ApiResponse(200, video, "Video added successfully"))
 
 })
 
@@ -45,7 +51,7 @@ const incrementViewCount = asyncHandler(async (req, res) => {
     const updatedVideo = await Video.findByIdAndUpdate(
         videoId,
         { $inc: { views: 1 } },
-        { new: true } 
+        { new: true }
     );
 
     if (!updatedVideo) {
@@ -53,19 +59,67 @@ const incrementViewCount = asyncHandler(async (req, res) => {
     }
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, updatedVideo, "View count incremented successfully"));
+        .status(200)
+        .json(new ApiResponse(200, updatedVideo, "View count incremented successfully"));
 });
 
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: get video by id
+    if (!videoId) {
+        throw new ApiError(404, "Video id not found")
+    }
+    const video = await Video.findById(videoId);
+    if (!video) {
+        throw new ApiError(500, "Internal Server error")
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, video, "Video has been sent"))
 })
+
 
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: update video details like title, description, thumbnail
+    const { title, description } = req.body;
+    const thumbnailLocalPath = req.file?.path;
+    if (!videoId) {
+        throw new ApiError(404, "Video Id is required")
+    }
+    if (!title && !description) {
+        throw new ApiError(404, "Enter something to update")
+    }
+    console.log(videoId, "94");
+    let thumbnail;
+    if (thumbnailLocalPath) {
+        thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
 
+        // if (thumbnail) {
+        //     const video = await Video.findById(new mongoose.Types.ObjectId(videoId))
+            
+        //     const deletedThumbnail = await deleteThumbnailFromCloudinary(video.thumbnailPublicId)//old thum ko public_id chaiyo
+
+        //     if (!deletedThumbnail) {
+        //         throw new ApiError(500, "Error deleting from cloudinary")
+        //     }
+        // }
+    }
+
+    const updatedVideo = await Video.findByIdAndUpdate(
+        videoId,
+        {
+            title,
+            description,
+            thumbnail: thumbnail?.url
+        },
+        { new: true }
+    )
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, updatedVideo, "Video updated successfully"))
 })
 
 const deleteVideo = asyncHandler(async (req, res) => {
@@ -77,8 +131,8 @@ const deleteVideo = asyncHandler(async (req, res) => {
     }
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, {}, "Video deleted successfully"))
+        .status(200)
+        .json(new ApiResponse(200, {}, "Video deleted successfully"))
     //TODO: delete video
 })
 

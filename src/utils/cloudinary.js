@@ -1,10 +1,10 @@
-import {v2 as cloudinary} from 'cloudinary';
-import fs from 'fs'
-          
-cloudinary.config({ 
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
-  api_key: process.env.CLOUDINARY_API_KEY, 
-  api_secret: process.env.CLOUDINARY_API_SECRET
+import { v2 as cloudinary } from 'cloudinary';
+import fs from 'fs';
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 const uploadOnCloudinary = async (localFilePath) => {
@@ -22,4 +22,34 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 }
 
-export {uploadOnCloudinary}
+const deleteFromFs = async (localFilePath) => {
+    try {
+        if (!localFilePath) return null;
+        fs.unlinkSync(localFilePath)
+    } catch (error) {
+        console.log('error while deleting from fs: ', error);
+    }
+}
+
+const deleteThumbnailFromCloudinary = async (thumbnailId) => {
+    try {
+        await cloudinary.uploader.destroy(thumbnailId);
+    } catch (error) {
+        console.log('error while deleting thumbnail from cloudinary: ', error);
+    }
+}
+
+const deleteVideoFromCloudinary = async (videoId) => {
+    try {
+        await cloudinary.uploader.destroy(videoId, {resource_type: 'video', type: 'authenticated'});
+    } catch (error) {
+        console.log('error while deleting thumbnail from cloudinary: ', error);
+    }
+}
+
+export { 
+    uploadOnCloudinary, 
+    deleteFromFs, 
+    deleteThumbnailFromCloudinary,
+    deleteVideoFromCloudinary
+}
