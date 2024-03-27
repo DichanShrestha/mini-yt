@@ -6,7 +6,7 @@ const videoSchema = new Schema({
         type: String, //cloudnary url
         required: true,
     },
-    videoPublicId: {
+    videoPublicId: { // for deleting image in cloudinary
         type: String,
         required: true,
     },
@@ -14,7 +14,7 @@ const videoSchema = new Schema({
         type: String, //cloudnary url
         required: true,
     },
-    thumbnailPublicId: {
+    thumbnailPublicId: { // for deleting image in cloudinary
         type: String,
         required: true
     },

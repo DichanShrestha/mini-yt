@@ -9,11 +9,57 @@ import {
     deleteFromFs,
     deleteThumbnailFromCloudinary
 } from "../utils/cloudinary.js"
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2"
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
+    const { page = 1, limit = 10, query, sortType, sortBy } = req.query
     //TODO: get all videos based on query, sort, pagination
+    Video.schema.plugin(mongooseAggregatePaginate);
+
+    // if (!isValidObjectId(userId)) {
+    //     throw new ApiError("404", "User id not found");
+    // }
+
+    let pipeline = [];
+
+    // pipeline.push({
+    //     $match: {
+    //         _id: mongoose.Types.ObjectId(userId)
+    //     }
+    // })
+
+    if (query) {
+        pipeline.push({
+            $match: {
+                title: {
+                    $regex: query,
+                    $options: 'i'
+                }
+            }
+        })
+    }
+
+    if (sortType && sortBy) { // asc for ascending
+        let sortOrder = sortType === 'asc'? 1 : -1;
+        pipeline.push({
+            $sort: {
+                [sortBy]: sortOrder
+            }
+        })
+    }
+    pipeline.push({
+        $limit: parseInt(limit)
+    })
+    pipeline.push({
+        $skip: (page - 1) * limit
+    })
+
+    const result = await Video.aggregate(pipeline)
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, result, "Video retrieved successfully"))
 })
 
 const publishAVideo = asyncHandler(async (req, res) => {
@@ -138,6 +184,16 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
     const { videoId } = req.params
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError('404', "Video id not found")
+    }
+    const video = await Video.findById(mongoose.Types.ObjectId(videoId));
+
+    const publishStatus = video.isPublished;
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, publishStatus, "toggled sucessfully"))
 })
 
 export {
