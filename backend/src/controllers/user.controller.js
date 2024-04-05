@@ -5,7 +5,7 @@ import { uploadOnCloudinary } from '../utils/cloudinary.js'
 import { ApiResponse } from '../utils/ApiResponse.js';
 import jwt from 'jsonwebtoken'
 import mongoose from "mongoose";
-
+//not req
 const generateAccessAndRefreshToken = async (userId) => {
     try {
         const user = await User.findById(userId);
@@ -18,7 +18,7 @@ const generateAccessAndRefreshToken = async (userId) => {
         throw new ApiError(500, "Something went wrong while generating Refresh and Access Token")
     }
 }
-
+//done
 const registerUser = asyncHandler( async (req, res) => {
     // get user details from frontend
     // validation - not empty
@@ -92,7 +92,7 @@ const registerUser = asyncHandler( async (req, res) => {
     )
 
 } )
-
+//done
 const loginUser = asyncHandler(async (req, res) => {
     // req body -> data
     // username or email
@@ -142,7 +142,7 @@ const loginUser = asyncHandler(async (req, res) => {
             )
         )
 })
-
+//done
 const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
@@ -209,11 +209,10 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         throw new ApiError(401, error?.message || "Invalid Access Token")
     }
 })
-
+//done
 const changeCurrentPassword = asyncHandler(async (req, res) => {
     const { oldPassword, newPassword } = req.body;
-
-    const user = await User.findById(req.user._id)//ya cac la id matrai lekhya xa
+    const user = await User.findById(req.user._id)
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
 
     if (!isPasswordCorrect) {
@@ -227,7 +226,7 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
         .status(200)
         .json(new ApiResponse(200, {}, "Password Changed Successfully"))
 })
-
+//done
 const getCurrentUser = asyncHandler(async (req, res) => {
     return res
         .status(200)

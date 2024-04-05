@@ -8,7 +8,7 @@ import Step1 from './auth/Register/Step1.jsx'
 import Step2 from './auth/Register/Step2.jsx'
 import Step3 from './auth/Register/Step3.jsx'
 import Signout from './auth/Signout.jsx';
-
+import ForgotPass from './utils/ForgotPass.jsx';
 
 const router = createBrowserRouter([
   {
@@ -34,6 +34,10 @@ const router = createBrowserRouter([
   {
     path: '/signout',
     element: <Signout />
+  },
+  {
+    path: '/forgotpass',
+    element: <ForgotPass />
   }
 ])
 

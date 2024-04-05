@@ -21,12 +21,8 @@ function App() {
     <div>
       <Navbar user={user} />
       <div className="flex mt-16">
-        <div className="w-1/6 bg-red-900">
-          <Sidebar />
-        </div>
-        <div className="w-5/6 bg-slate-900">
-          <Content />
-        </div>
+        <Sidebar />
+        <Content />
       </div>
     </div>
   );

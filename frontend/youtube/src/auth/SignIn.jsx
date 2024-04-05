@@ -1,25 +1,26 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { Link, useNavigate  } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [isFilled, setIsFilled] = useState(true);
-  const navigate = useNavigate()
-  let response;
+  const [errorMessage, setErrorMessage] = useState(""); // State for error message
+  const navigate = useNavigate();
   const login = async (e) => {
     e.preventDefault();
     if (!username && !email) {
-      console.error("Username or email is required");
+      setErrorMessage("Username or email is required");
       setIsFilled(false);
       return;
     }
-    if (password === "") {
-      console.log("password is required");
+    if (!password) {
+      setErrorMessage("password is required");
       setIsFilled(false);
     }
+    setIsFilled(true)
     const data = {
       email,
       password,
@@ -34,20 +35,21 @@ function SignIn() {
           headers: {
             "Content-Type": "application/json",
           },
-          withCredentials: 'include'
+          withCredentials: "include",
         }
       );
-      response = res;
-      
       if (res.status === 200) {
-        // document.cookie = `accessToken=${res.data.data.accessToken}; path=/`;
-        // document.cookie = `refreshToken=${res.data.data.refreshToken}; path=/`;
-        navigate('/')
+        navigate("/");
       }
-      console.log(response);
     } catch (error) {
       console.error(error, "error while login");
+      if (error.response && (error.response.status === 404 || error.response.status === 401)) {
+        setErrorMessage("Invalid username, email, or password");
+      } else {
+        setErrorMessage("Error during login. Please try again.");
+      }
     }
+    
   };
 
   return (
@@ -68,6 +70,7 @@ function SignIn() {
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
               Sign in to your account
             </h1>
+
             <form className="space-y-4" action="#">
               <div>
                 <label
@@ -125,6 +128,9 @@ function SignIn() {
                   autoComplete="current-password"
                 />
               </div>
+              {errorMessage && (
+                <div className="text-red-500 text-sm">{errorMessage}</div>
+              )}
               <div className="flex items-center justify-between">
                 <div className="flex items-start">
                   <div className="flex items-center h-5">
@@ -140,15 +146,15 @@ function SignIn() {
                     </label>
                   </div>
                 </div>
-                <a
-                  href="/"
+                <Link
+                  to="/forgotpass"
                   className="text-sm font-medium text-primary-600 hover:underline"
                 >
                   Forgot password?
-                </a>
+                </Link>
               </div>
               <button
-                disabled = {!isFilled}
+                disabled={!isFilled}
                 type="submit"
                 onClick={login}
                 className="btn-style"
