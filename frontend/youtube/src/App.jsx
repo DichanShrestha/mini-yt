@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar/Navbar";
 import useUser from "./hook/useUser";
 import Sidebar from "./components/Sidebar/Sidebar";
 import Content from "./components/Content/Content";
+
 function App() {
   const [user, setUser] = useState(null);
   useEffect(() => {
@@ -23,7 +24,7 @@ function App() {
       <div className="flex mt-16">
         <Sidebar />
         <Content />
-      </div>
+      </div>      
     </div>
   );
 }

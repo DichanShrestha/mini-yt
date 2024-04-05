@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 function Navbar({ user }) {
   const navigate = useNavigate();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(true);
   let userAvatar;
-  let coverImage;
   if (user !== null) {
     userAvatar = user.data.data.avatar;
-    coverImage = user.data.data.coverImage;
+    //coverimg same
   }
 
   const navigateToSignIn = () => {
@@ -103,47 +110,29 @@ function Navbar({ user }) {
                 toggleDropdown();
               }}
             >
-              <img
-                className="object-cover w-10 h-10 rounded-full cursor-pointer"
-                src={
-                  userAvatar
-                    ? userAvatar
-                    : "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
-                }
-                alt="user"
-              />
-              {dropdownOpen && (
-                <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                  <div
-                    className="py-1"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="options-menu"
-                  >
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                      role="menuitem"
-                    >
-                      Profile
-                    </a>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                      role="menuitem"
-                    >
-                      Settings
-                    </a>
-                    <Link
-                      to="/signout"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                      role="menuitem"
-                    >
-                      Sign out
-                    </Link>
-                  </div>
-                </div>
-              )}
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <img
+                    className="object-cover w-10 h-10 rounded-full cursor-pointer"
+                    src={
+                      userAvatar
+                        ? userAvatar
+                        : "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg"
+                    }
+                    alt="user"
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className=' mr-6'>
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                  <DropdownMenuItem>Billing</DropdownMenuItem>
+                  <DropdownMenuItem>Team</DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link to='/signout'>Sign Out</Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
