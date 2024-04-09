@@ -122,10 +122,10 @@ function Navbar({ user }) {
                     alt="user"
                   />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className=' mr-6'>
+                <DropdownMenuContent className=' mr-20 w-52'>
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>Profile</DropdownMenuItem>
+                  <DropdownMenuItem>Update Profile</DropdownMenuItem>
                   <DropdownMenuItem>Billing</DropdownMenuItem>
                   <DropdownMenuItem>Team</DropdownMenuItem>
                   <DropdownMenuItem>

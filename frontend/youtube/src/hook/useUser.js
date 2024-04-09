@@ -13,6 +13,7 @@ const useUser = async () => {
         console.log(error, "error while retrieving user");
         throw error;
     }    
+
 }
 
 export default useUser;

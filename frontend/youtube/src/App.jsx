@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "./components/Navbar/Navbar";
 import useUser from "./hook/useUser";
 import Sidebar from "./components/Sidebar/Sidebar";
-import Content from "./components/Content/Content";
+import { Outlet } from 'react-router-dom'
 
 function App() {
   const [user, setUser] = useState(null);
@@ -21,10 +21,8 @@ function App() {
   return (
     <div>
       <Navbar user={user} />
-      <div className="flex mt-16">
-        <Sidebar />
-        <Content />
-      </div>      
+      <Sidebar />
+      <Outlet />
     </div>
   );
 }

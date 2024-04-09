@@ -9,11 +9,18 @@ import Step2 from './auth/Register/Step2.jsx'
 import Step3 from './auth/Register/Step3.jsx'
 import Signout from './auth/Signout.jsx';
 import ForgotPass from './utils/ForgotPass.jsx';
+import YourChannel from './components/YourChannel/YourChannel.jsx';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />
+    element: <App />,
+    children: [
+      {
+        path: '/yourchannel',
+        element: <YourChannel />
+      }
+    ]
   },
   {
     path: '/signin',
@@ -38,7 +45,8 @@ const router = createBrowserRouter([
   {
     path: '/forgotpass',
     element: <ForgotPass />
-  }
+  },
+  
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(
