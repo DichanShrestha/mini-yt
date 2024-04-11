@@ -86,6 +86,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
         isPublished: false,
         views: 0
     })
+    console.log(video);
     return res
         .status(200)
         .json(new ApiResponse(200, video, "Video added successfully"))

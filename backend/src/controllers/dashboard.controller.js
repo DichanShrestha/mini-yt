@@ -97,8 +97,6 @@ const getChannelVideos = asyncHandler(async (req, res) => {
             $project: {
                 videoPublicId: 0,
                 thumbnailPublicId: 0,
-                createdAt: 0,
-                updatedAt: 0
             }
         }
     ])

@@ -12,6 +12,7 @@ import { Input } from "../ui/input";
 import { Label } from "@radix-ui/react-dropdown-menu";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
+import Content from "../Content/Content";
 
 function YourChannel() {
   const [userData, setUserData] = useState(null);
@@ -19,11 +20,13 @@ function YourChannel() {
   const [newFilePath, setNewFilePath] = useState("");
   const [totalSubs, setTotalSubs] = useState("");
   const [totalVids, setTotalVids] = useState([]);
+  //down for publishing vids
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [thumbnail, setThumbnail] = useState("");
   const [video, setVideo] = useState("");
 
+  //for user data
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -41,6 +44,7 @@ function YourChannel() {
   const username = userData?.data?.username;
   const fullname = userData?.data?.fullName;
 
+  //to change user avatar
   const changeUserAvatar = async () => {
     const formData = new FormData();
     formData.append("avatar", newFilePath);
@@ -63,6 +67,7 @@ function YourChannel() {
     }
   };
 
+  //for user stats
   useEffect(() => {
     const getUserStats = async () => {
       const response = await axios.get(
@@ -79,6 +84,7 @@ function YourChannel() {
     getUserStats();
   }, []);
 
+  //to get user videos
   useEffect(() => {
     (async () => {
       const response = await axios.get(
@@ -114,6 +120,7 @@ function YourChannel() {
         withCredentials: true,
       }
     );
+    console.log(response);
   };
 
   return (
@@ -153,7 +160,7 @@ function YourChannel() {
         <div>
           <h2 className=" font-medium text-3xl mb-3">{username}</h2>
           <p>
-            {fullname} ‧ {totalSubs} Subscribers ‧{" "}
+            {fullname} ‧ {totalSubs} Subscribers ‧ {totalVids.length} Videos
           </p>
         </div>
       </div>
@@ -241,7 +248,19 @@ function YourChannel() {
             </div>
           </div>
         ) : (
-          ""
+          <div className="flex flex-wrap gap-10">
+            {totalVids.map(video => (
+            <div key={video._id}>
+              <Content
+                videoURL={video.videoFile}
+                thumbnailURL={video.thumbnail}
+                title={video.title}
+                views={video.views}
+                time={video.createdAt}
+              />
+            </div>
+            ))}
+          </div>
         )}
       </div>
     </div>

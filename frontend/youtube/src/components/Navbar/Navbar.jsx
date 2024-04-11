@@ -43,16 +43,18 @@ function Navbar({ user }) {
   }, [dropdownOpen]);
 
   return (
-    <nav className="bg-white shadow-lg fixed top-0 w-full">
+    <nav className="bg-white shadow-lg fixed top-0 w-full z-50">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
-              <img
-                className="h-8 w-auto"
-                src="https://www.gstatic.com/youtube/img/branding/youtubelogo/svg/youtubelogo.svg"
-                alt="YouTube Logo"
-              />
+              <Link to='/'>
+                <img
+                  className="h-8 w-auto"
+                  src="https://www.gstatic.com/youtube/img/branding/youtubelogo/svg/youtubelogo.svg"
+                  alt="YouTube Logo"
+                />
+              </Link>
             </div>
             <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
               <a
@@ -122,14 +124,14 @@ function Navbar({ user }) {
                     alt="user"
                   />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className=' mr-20 w-52'>
+                <DropdownMenuContent className=" mr-20 w-52">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>Update Profile</DropdownMenuItem>
                   <DropdownMenuItem>Billing</DropdownMenuItem>
                   <DropdownMenuItem>Team</DropdownMenuItem>
                   <DropdownMenuItem>
-                    <Link to='/signout'>Sign Out</Link>
+                    <Link to="/signout">Sign Out</Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
