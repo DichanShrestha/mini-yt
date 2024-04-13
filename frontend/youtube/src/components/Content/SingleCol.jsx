@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-function SingleCol({ videoURL, title, views, time, thumbnailURL }) {
+function SingleCol({id, videoURL, title, views, time, thumbnailURL }) {
   const [exactTime, setExactTime] = useState(0);
   const navigate = useNavigate();
 
@@ -22,24 +22,22 @@ function SingleCol({ videoURL, title, views, time, thumbnailURL }) {
   }, []);
 
   const handleClick = () => {
-    navigate("/playvideo", {
-      state: { videoURL, title, views, exactTime, thumbnailURL },
-    });
+    navigate(`/playvideo/${id}`);
   };
 
   return (
-    <div className="flex flex-col mt-8">
+    <div className="flex gap-5">
       <div className="w-60 h-36" onClick={handleClick}>
-        <Link to="/playvideo">
+        <Link to={`/playvideo/${id}`}>
           <img
             src={thumbnailURL}
-            className="w-full h-full rounded-lg"
+            className="w-full h-full rounded-2xl"
             alt="Thumbnail"
           />
         </Link>
       </div>
       <div className="mt-2">
-        <p className="text-sm font-medium">{title}</p>
+        <p className="text-lg font-medium">{title}</p>
         <p className="text-xs text-gray-500">
           {views} views ‧ {exactTime}
         </p>

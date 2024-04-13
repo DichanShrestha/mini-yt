@@ -8,16 +8,26 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import useUser from "@/hook/useUser";
 
-function Navbar({ user }) {
+function Navbar() {
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(true);
   let userAvatar;
-  if (user !== null) {
-    userAvatar = user.data.data.avatar;
-    //coverimg same
-  }
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userData = await useUser();
+        setUser(userData);
+      } catch (error) {
+        console.error("Error while fetching user:", error);
+      }
+    };
 
+    fetchUser();
+  }, []);
+  userAvatar = user?.data.data.avatar
   const navigateToSignIn = () => {
     navigate("/signin");
   };

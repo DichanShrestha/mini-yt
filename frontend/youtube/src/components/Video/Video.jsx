@@ -1,21 +1,31 @@
-import React, { useRef, useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import SingleCol from "../Content/SingleCol";
-import useVideo from "@/hook/useVideo";
+import { useVideoById } from "@/hook/useVideo";
 import useUser from "@/hook/useUser";
+import useVideo from "@/hook/useVideo";
+import Navbar from "../Navbar/Navbar";
+
 function Video() {
   const [totalVids, setTotalVids] = useState([]);
   const [user, setUser] = useState(null);
-  const location = useLocation();
-  const { videoURL, exactTime, title, views, thumbnailURL } = location.state || {} ;
-  const videoRef = useRef(null);
+  const [vidURL, setVidURL] = useState("");
+  const { id } = useParams();
 
   useEffect(() => {
-    (async () => {
-      const video = await useVideo();
-      setTotalVids(video);
-    })();
-  }, []);
+    const fetchVideo = async () => {
+      try {
+        const video = await useVideoById({ id });
+        console.log(video);
+        setVidURL(video?.videoFile);
+        console.log(vidURL);
+      } catch (error) {
+        console.error("Error fetching video:", error);
+      }
+    };
+
+    fetchVideo();
+  }, [id]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -29,30 +39,52 @@ function Video() {
 
     fetchUser();
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      const video = await useVideo();
+      setTotalVids(video);
+    })();
+  }, []);
+
   return (
-    <div className="flex h-screen">
-      <div className="w-3/4 mt-20">
-        <div className="video-player ml-20 relative">
-          <video ref={videoRef} className="video-element w-full h-auto" controls>
-            <source src={videoURL} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
+    <div>
+      <Navbar />
+      <div className="flex h-screen">
+        <div className="w-3/5 flex justify-center align-middle bg-gray-100 rounded-lg">
+          <div className="video-player">
+            <video
+              src={vidURL}
+              ref={(video) => {
+                if (video) {
+                  video.play().catch((error) => {
+                    console.error("Autoplay failed:", error);
+                  });
+                }
+              }}
+              className="video-element w-full h-96 max-w-full mt-24"
+              controls
+            >
+              Your browser does not support the video tag.
+            </video>
+          </div>
         </div>
-      </div>
-      <div className="w-1/4 overflow-y-auto">
-        <div className="ml-4">
-          <h2 className="text-xl font-bold mb-4">Recommended Videos</h2>
-          {totalVids.map((video) => (
-            <div key={video._id} className="mt-16">
-              <SingleCol
-                videoURL={video.videoFile}
-                thumbnailURL={video.thumbnail}
-                title={video.title}
-                views={video.views}
-                time={video.createdAt}
-              />
-            </div>
-          ))}
+        <div className="w-2/5 overflow-y-auto">
+          <div className="ml-4">
+            <h2 className="text-xl font-bold mb-4">Recommended Videos</h2>
+            {totalVids.map((video) => (
+              <div key={video._id} className="flex mt-3">
+                <SingleCol
+                  id={video._id}
+                  videoURL={video.videoFile}
+                  thumbnailURL={video.thumbnail}
+                  title={video.title}
+                  views={video.views}
+                  time={video.createdAt}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

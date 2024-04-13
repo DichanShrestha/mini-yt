@@ -22,9 +22,7 @@ function Content({ id, videoURL, title, views, time, thumbnailURL }) {
   }, []);
 
   const handleClick = () => {
-    navigate(`/playvideo/${id}`, {
-      state: { videoURL, title, views, exactTime, thumbnailURL },
-    });
+    navigate(`/playvideo/${id}`);
   };
 
   return (

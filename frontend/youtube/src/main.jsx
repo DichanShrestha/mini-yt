@@ -20,10 +20,6 @@ const router = createBrowserRouter([
       {
         path: '/yourchannel',
         element: <YourChannel />
-      },
-      {
-        path: '/playvideo/:id',
-        element: <Video />
       }
     ]
   },
@@ -51,7 +47,10 @@ const router = createBrowserRouter([
     path: '/forgotpass',
     element: <ForgotPass />
   },
-  
+  {
+    path: '/playvideo/:id',
+    element: <Video />
+  }
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(
