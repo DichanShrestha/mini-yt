@@ -24,8 +24,8 @@ function App() {
     fetchUser();
   }, []);
 
-  const hideSidebarRoutes = ["/playvideo"];
-  const hideAppContentRoutes = ["/yourchannel"];
+  const hideSidebarRoutes = ["/playvideo/:id"];
+  const hideAppContentRoutes = ["/yourchannel", "/playvideo/:id"];
   const shouldHideContent = hideAppContentRoutes.includes(location.pathname);
   const shouldHideSidebar = hideSidebarRoutes.includes(location.pathname);
 
@@ -50,6 +50,7 @@ function App() {
           {totalVids && totalVids.map((video) => (
             <div key={video._id}>
               <Content
+                id={video._id}
                 videoURL={video.videoFile}
                 thumbnailURL={video.thumbnail}
                 title={video.title}

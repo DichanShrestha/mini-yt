@@ -16,6 +16,8 @@ app.use(express.static("public"))
 
 app.use(cookieParser()) // allows access for server to perform CRUD operations in the browser's cookie
 
+  
+
 import userRouter from './routes/user.routes.js';
 import tweetRouter from './routes/tweet.routes.js';
 import videoRouter from './routes/video.routes.js';

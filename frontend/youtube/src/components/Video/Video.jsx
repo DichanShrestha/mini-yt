@@ -7,7 +7,7 @@ function Video() {
   const [totalVids, setTotalVids] = useState([]);
   const [user, setUser] = useState(null);
   const location = useLocation();
-  const { videoURL, exactTime, title, views, thumbnailURL } = location.state;
+  const { videoURL, exactTime, title, views, thumbnailURL } = location.state || {} ;
   const videoRef = useRef(null);
 
   useEffect(() => {

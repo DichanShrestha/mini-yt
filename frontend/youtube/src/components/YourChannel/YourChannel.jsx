@@ -124,7 +124,7 @@ function YourChannel() {
   };
 
   return (
-    <div className="h-screen w-screen pl-64 pt-16">
+    <div className="h-screen w-screen pl-64 pt-36">
       <div className="flex gap-10 pt-10">
         <div>
           <Dialog>
@@ -165,7 +165,7 @@ function YourChannel() {
         </div>
       </div>
       <div className="">
-        <hr className="w-screen border-t-1 border-gray-400" />
+        <hr className="w-full border-t-1 border-gray-400" />
         <p className="mt-2">Videos</p>
         {totalVids.length === 0 ? (
           <div className="flex justify-center items-center h-60">

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-function Content({ videoURL, title, views, time, thumbnailURL }) {
+function Content({ id, videoURL, title, views, time, thumbnailURL }) {
   const [exactTime, setExactTime] = useState(0);
   const navigate = useNavigate();
 
@@ -22,7 +22,7 @@ function Content({ videoURL, title, views, time, thumbnailURL }) {
   }, []);
 
   const handleClick = () => {
-    navigate("/playvideo", {
+    navigate(`/playvideo/${id}`, {
       state: { videoURL, title, views, exactTime, thumbnailURL },
     });
   };
@@ -30,7 +30,7 @@ function Content({ videoURL, title, views, time, thumbnailURL }) {
   return (
     <div className="flex flex-col mt-20">
       <div className="w-60 h-36" onClick={handleClick}>
-        <Link to="/playvideo">
+        <Link to={`/playvideo/${id}`}>
           <img
             src={thumbnailURL}
             className="w-full h-full rounded-lg"
