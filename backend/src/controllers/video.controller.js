@@ -41,7 +41,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     }
 
     if (sortType && sortBy) { // asc for ascending
-        let sortOrder = sortType === 'asc'? 1 : -1;
+        let sortOrder = sortType === 'asc' ? 1 : -1;
         pipeline.push({
             $sort: {
                 [sortBy]: sortOrder
@@ -58,8 +58,8 @@ const getAllVideos = asyncHandler(async (req, res) => {
     const result = await Video.aggregate(pipeline)
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, result, "Video retrieved successfully"))
+        .status(200)
+        .json(new ApiResponse(200, result, "Video retrieved successfully"))
 })
 
 const publishAVideo = asyncHandler(async (req, res) => {
@@ -126,6 +126,60 @@ const getVideoById = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, video, "Video has been sent"))
 })
 
+const getVideoOwner = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+    console.log(videoId);
+    if (!videoId) {
+        throw new ApiError(404, "videoId not found")
+    }
+    const result = await Video.aggregate([
+        {
+            '$match': {
+                '_id': new mongoose.Types.ObjectId(videoId)
+            }
+        }, {
+            '$lookup': {
+                'from': 'users',
+                'localField': 'owner',
+                'foreignField': '_id',
+                'as': 'user_details'
+            }
+        }, {
+            '$addFields': {
+                'user_details': {
+                    '$arrayElemAt': [
+                        '$user_details', 0
+                    ]
+                }
+            }
+        }, {
+            '$project': {
+                'duration': 0,
+                'views': 0,
+                'isPublished': 0,
+                'thumbnailPublicId': 0,
+                'description': 0,
+                'title': 0,
+                'videoFile': 0,
+                'videoPublicId': 0,
+                'thumbnail': 0,
+                'createdAt': 0,
+                'updatedAt': 0,
+                '__v': 0,
+                'user_details.password': 0,
+                'user_details.createdAt': 0,
+                'user_details.updatedAt': 0
+            }
+        }
+    ])
+    console.log(result);
+    if (!result) {
+        throw new ApiError(500, "Error while getting user")
+    }
+    return res
+    .status(200)
+    .json(new ApiResponse(200, result, "video owner retrieved successfully"))
+})
 
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
@@ -145,7 +199,7 @@ const updateVideo = asyncHandler(async (req, res) => {
 
         // if (thumbnail) {
         //     const video = await Video.findById(new mongoose.Types.ObjectId(videoId))
-            
+
         //     const deletedThumbnail = await deleteThumbnailFromCloudinary(video.thumbnailPublicId)//old thum ko public_id chaiyo
 
         //     if (!deletedThumbnail) {
@@ -193,8 +247,8 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
     const publishStatus = video.isPublished;
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, publishStatus, "toggled sucessfully"))
+        .status(200)
+        .json(new ApiResponse(200, publishStatus, "toggled sucessfully"))
 })
 
 export {
@@ -204,5 +258,6 @@ export {
     updateVideo,
     deleteVideo,
     togglePublishStatus,
-    incrementViewCount
+    incrementViewCount,
+    getVideoOwner
 }

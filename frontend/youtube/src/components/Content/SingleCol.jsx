@@ -9,15 +9,17 @@ function SingleCol({id, videoURL, title, views, time, thumbnailURL }) {
     const timeDiff = new Date() - new Date(time);
     const timeInSec = timeDiff / 1000;
     if (timeInSec < 10) {
-      setExactTime(timeInSec + " sec"); // 3 sec
+      setExactTime(timeInSec + " sec");
     } else if (timeInSec >= 60 && timeInSec <= 3600) {
-      setExactTime(Math.floor(timeInSec / 60) + " min"); // 3 min
+      setExactTime(Math.floor(timeInSec / 60) + " min");
     } else if (timeInSec >= 3600 && timeInSec <= 86400) {
-      setExactTime(Math.floor(timeInSec / 3600) + " hr"); // 3 hr
+      setExactTime(Math.floor(timeInSec / 3600) + " hr");
     } else if (timeInSec >= 86400 && timeInSec <= 2592000) {
-      setExactTime(Math.floor(timeInSec / 86400) + "days"); // 3 days
+      setExactTime(Math.floor(timeInSec / 86400) + " days");
+    } else if(timeInSec >= 2592000 && timeInSec <= 31104000){
+      setExactTime(Math.floor(timeInSec / 2592000) + " month");
     } else {
-      setExactTime(Math.floor(timeInSec / 2592000) + " yrs"); // 3 yrs
+      setExactTime(Math.floor(timeInSec/31104000) + "years");
     }
   }, []);
 

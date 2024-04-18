@@ -6,7 +6,8 @@ import {
     publishAVideo,
     togglePublishStatus,
     updateVideo,
-    incrementViewCount
+    incrementViewCount,
+    getVideoOwner
 } from "../controllers/video.controller.js"
 import {verifyJWT} from "../middlewares/auth.middleware.js"
 import {upload} from "../middlewares/multer.middleware.js"
@@ -39,6 +40,8 @@ router
     .patch(upload.single("thumbnail"), updateVideo)
     // .patch(incrementViewCount);
 router.route("/toggle/publish/:videoId").patch(togglePublishStatus);
+router.route('/owner/:videoId').get(getVideoOwner)
+
 
 
 export default router

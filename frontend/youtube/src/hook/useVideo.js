@@ -25,6 +25,17 @@ const useVideoById = async ({ id }) => {
   }
 };
 
-export { useVideoById }
+const useGetVideoUser = async ({ id }) => {
+  try {
+    const response = await axios.get(`http://localhost:8000/api/v1/videos/owner/${id}`, {
+      withCredentials: true,
+    });
+    return response?.data.data[0];
+  } catch (error) {
+    console.log(error, "error while extracting video by id");
+  }
+}
+
+export { useVideoById, useGetVideoUser }
 
 export default useVideo;

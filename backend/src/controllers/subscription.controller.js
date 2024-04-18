@@ -9,7 +9,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 const toggleSubscription = asyncHandler(async (req, res) => {
     const { channelId } = req.params;
     const userId = req.user._id;
-
+    console.log(userId, '\n', channelId);
     try {
         const subscription = await Subscription.findOne({
             subscriber: userId,

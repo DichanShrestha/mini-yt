@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import useUser from "@/hook/useUser";
+import useUser, { useUserStats } from "@/hook/useUser";
 import {
   Dialog,
   DialogContent,
@@ -69,20 +69,12 @@ function YourChannel() {
 
   //for user stats
   useEffect(() => {
-    const getUserStats = async () => {
-      const response = await axios.get(
-        "http://localhost:8000/api/v1/dash/stats",
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
-      setTotalSubs(response?.data.data.totalSubs);
-    };
-    getUserStats();
+    (async () => {
+      const userStats = await useUserStats();
+      setTotalSubs(userStats.totalSubs)
+    })();
   }, []);
+  
 
   //to get user videos
   useEffect(() => {
@@ -249,16 +241,16 @@ function YourChannel() {
           </div>
         ) : (
           <div className="flex flex-wrap gap-10">
-            {totalVids.map(video => (
-            <div key={video._id}>
-              <Content
-                videoURL={video.videoFile}
-                thumbnailURL={video.thumbnail}
-                title={video.title}
-                views={video.views}
-                time={video.createdAt}
-              />
-            </div>
+            {totalVids.map((video) => (
+              <div key={video._id}>
+                <Content
+                  videoURL={video.videoFile}
+                  thumbnailURL={video.thumbnail}
+                  title={video.title}
+                  views={video.views}
+                  time={video.createdAt}
+                />
+              </div>
             ))}
           </div>
         )}
