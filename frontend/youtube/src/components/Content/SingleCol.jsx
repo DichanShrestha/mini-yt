@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useGetVideoUser } from "@/hook/useVideo";
 
 function SingleCol({id, videoURL, title, views, time, thumbnailURL }) {
   const [exactTime, setExactTime] = useState(0);
   const navigate = useNavigate();
+  const [uid, setUid] = useState('')
 
   useEffect(() => {
     const timeDiff = new Date() - new Date(time);
@@ -23,8 +25,15 @@ function SingleCol({id, videoURL, title, views, time, thumbnailURL }) {
     }
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      const data = await useGetVideoUser({vid: id})
+      setUid(data?.owner)
+    })();
+  }, [])
+
   const handleClick = () => {
-    navigate(`/playvideo/${id}`);
+    navigate(`/playvideo/${uid}/vid/${id}`);
   };
 
   return (

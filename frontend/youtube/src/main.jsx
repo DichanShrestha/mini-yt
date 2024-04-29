@@ -48,7 +48,7 @@ const router = createBrowserRouter([
     element: <ForgotPass />
   },
   {
-    path: '/playvideo/:id',
+    path: '/playvideo/:id/vid/:vid',
     element: <Video />
   }
 ])

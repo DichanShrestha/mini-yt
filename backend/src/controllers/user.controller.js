@@ -258,7 +258,6 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
     const avatarLocalPath = req.file?.path;
-    console.log(avatarLocalPath);
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar file is missing")
     }
@@ -369,7 +368,6 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                 }
             }
         ])
-        console.log(channel);
         if (!channel?.length) {
             throw new ApiError(404, "Channel does not exists")
         }

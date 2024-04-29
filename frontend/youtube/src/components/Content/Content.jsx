@@ -1,3 +1,4 @@
+import { useGetVideoUser } from "@/hook/useVideo";
 import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -5,6 +6,7 @@ function Content({ id, videoURL, title, views, time, thumbnailURL }) {
   const [exactTime, setExactTime] = useState(0);
   const navigate = useNavigate();
   const videoRef = useRef(null);
+  const [uid, setUid] = useState('')
 
   useEffect(() => {
     const timeDiff = new Date() - new Date(time);
@@ -26,14 +28,15 @@ function Content({ id, videoURL, title, views, time, thumbnailURL }) {
 
   useEffect(() => {
     (async () => {
-
+      const data = await useGetVideoUser({vid: id})
+      setUid(data?.owner)
     })();
   }, [])
 
   const handleClick = () => {
-    navigate(`/playvideo/${id}`);
+    navigate(`/playvideo/${uid}/vid/${id}`);
   };
-
+// console.log(uid);
   const handleMouseOver = () => {
     videoRef.current.play().catch((error) => {
       console.error("Autoplay failed:", error);
@@ -53,7 +56,7 @@ function Content({ id, videoURL, title, views, time, thumbnailURL }) {
         onMouseOut={handleMouseOut}
         onClick={handleClick}
       >
-        <Link to={`/playvideo/${id}`}>
+        <Link to={`/playvideo/${uid}`}>
           <img
             src={thumbnailURL}
             className="w-full h-full rounded-lg"

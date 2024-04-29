@@ -9,7 +9,6 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 const toggleSubscription = asyncHandler(async (req, res) => {
     const { channelId } = req.params;
     const userId = req.user._id;
-    console.log(userId, '\n', channelId);
     try {
         const subscription = await Subscription.findOne({
             subscriber: userId,
@@ -87,8 +86,34 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, result, "Data retrieved successfully"));
 })
 
+const checkIfSubscribed = asyncHandler(async (req, res) => {
+    const { channelId } = req.params;
+    const userId = req.user._id;
+    if (!channelId) {
+        throw new ApiError(404, "channel and videoId not found")
+    }
+
+    const result = await Subscription.aggregate(
+        [
+            {
+                '$match': {
+                    'channel': new mongoose.Types.ObjectId(channelId),
+                    'subscriber': new mongoose.Types.ObjectId(userId)
+                }
+            }
+        ]
+    )
+
+    const isSubscribed = result.length > 0
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, isSubscribed, "subscription checked"))
+})
+
 export {
     toggleSubscription,
     getUserChannelSubscribers,
-    getSubscribedChannels
+    getSubscribedChannels,
+    checkIfSubscribed
 }

@@ -24,8 +24,8 @@ function App() {
     fetchUser();
   }, []);
 
-  const hideSidebarRoutes = ["/playvideo/:id"];
-  const hideAppContentRoutes = ["/yourchannel", "/playvideo/:id"];
+  const hideSidebarRoutes = ["/playvideo/:id/vid/:vid"];
+  const hideAppContentRoutes = ["/yourchannel", "/playvideo/:id/vid/:vid"];
   const shouldHideContent = hideAppContentRoutes.includes(location.pathname);
   const shouldHideSidebar = hideSidebarRoutes.includes(location.pathname);
 

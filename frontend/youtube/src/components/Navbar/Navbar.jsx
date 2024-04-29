@@ -134,7 +134,7 @@ function Navbar() {
                     alt="user"
                   />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className=" mr-20 w-52">
+                <DropdownMenuContent className=" mr-20 w-52 bg-slate-700 text-white rounded-2xl p-4">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem>Update Profile</DropdownMenuItem>

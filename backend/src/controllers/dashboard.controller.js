@@ -6,6 +6,30 @@ import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 
+const getChannelSubs = asyncHandler(async (req, res) => {
+    const { channelId } = req.params;
+    console.log(req.params);
+    console.log(channelId, 'dash');
+    if (!channelId) {
+        throw new ApiError(404, "Channel id not found")
+    }
+    const totalVideoSubs = await Subscription.aggregate(
+        [
+            {
+                '$match': {
+                    'channel': new mongoose.Types.ObjectId(channelId)
+                }
+            }, {
+                '$count': 'totalSub'
+            }
+        ]
+    )
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, totalVideoSubs, "total subs of the cid"))
+})
+
 const getChannelStats = asyncHandler(async (req, res) => {
     // TODO: Get the channel stats like total video views, total subscribers, total videos, total likes etc.
     const userId = req.user._id;
@@ -102,11 +126,12 @@ const getChannelVideos = asyncHandler(async (req, res) => {
     ])
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, result, "all videos retrieved"))
+        .status(200)
+        .json(new ApiResponse(200, result, "all videos retrieved"))
 })
 
 export {
     getChannelStats,
-    getChannelVideos
+    getChannelVideos,
+    getChannelSubs
 }

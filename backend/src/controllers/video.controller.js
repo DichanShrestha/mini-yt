@@ -86,7 +86,6 @@ const publishAVideo = asyncHandler(async (req, res) => {
         isPublished: false,
         views: 0
     })
-    console.log(video);
     return res
         .status(200)
         .json(new ApiResponse(200, video, "Video added successfully"))
@@ -128,7 +127,6 @@ const getVideoById = asyncHandler(async (req, res) => {
 
 const getVideoOwner = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
-    console.log(videoId);
     if (!videoId) {
         throw new ApiError(404, "videoId not found")
     }
@@ -172,7 +170,6 @@ const getVideoOwner = asyncHandler(async (req, res) => {
             }
         }
     ])
-    console.log(result);
     if (!result) {
         throw new ApiError(500, "Error while getting user")
     }
@@ -180,6 +177,7 @@ const getVideoOwner = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, result, "video owner retrieved successfully"))
 })
+
 
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
@@ -192,7 +190,6 @@ const updateVideo = asyncHandler(async (req, res) => {
     if (!title && !description) {
         throw new ApiError(404, "Enter something to update")
     }
-    console.log(videoId, "94");
     let thumbnail;
     if (thumbnailLocalPath) {
         thumbnail = await uploadOnCloudinary(thumbnailLocalPath);

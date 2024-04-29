@@ -18,42 +18,30 @@ function Video() {
   const [title, setTitle] = useState("");
   const [avatar, setAvatar] = useState("");
   const [username, setUsername] = useState("");
-  const [totalSubs, setTotalSubs] = useState("");
+  const [totalSubs, setTotalSubs] = useState(0);
   const [totalLikes, setTotalLikes] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [videoUser, setVideoUser] = useState("");
   const [videoUserId, setVideoUserId] = useState("");
-  const { id } = useParams();
+  const { id, vid } = useParams();
 
   //videoById
   useEffect(() => {
-    const fetchVideo = async () => {
-      try {
-        const video = await useVideoById({ id });
-        setVidURL(video?.videoFile);
-        setTitle(video?.title);
-      } catch (error) {
-        console.error("Error fetching video:", error);
-      }
-    };
-
-    fetchVideo();
-  }, [id]);
-
+    (async () => {
+      const response = await useVideoById({ vid });
+      setVidURL(response?.videoFile);
+    })();
+  }, [vid]);
+  // console.log(isSubscribed);
   //user
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await useUser();
-        setAvatar(userData?.data.data.avatar);
-        setUsername(userData?.data.data.username);
-      } catch (error) {
-        console.error("Error while fetching user:", error);
-      }
-    };
-    fetchUser();
-  }, []);
+    (async () => {
+      const response = await useUser();
+      setUsername(response.data.data.username);
+      setAvatar(response.data.data.avatar);
+    })();
+  }, [username]);
 
   //video
   useEffect(() => {
@@ -62,12 +50,12 @@ function Video() {
       setTotalVids(video);
     })();
   }, []);
-
+  //video user
   useEffect(() => {
     (async () => {
-      const video = await useGetVideoUser({ id });
+      const video = await useGetVideoUser({ vid });
       setVideoUser(video?.user_details.username);
-      setVideoUserId(video?.user_details._id)
+      setVideoUserId(video?.user_details._id);
     })();
   }, [id]);
 
@@ -75,13 +63,12 @@ function Video() {
   useEffect(() => {
     (async () => {
       const userStats = await useUserStats();
-      setTotalSubs(userStats?.totalSubs);
       setTotalLikes(userStats?.totalLikes);
-      console.log(userStats);
     })();
   }, [isSubscribed]);
-// console.log(videoUserId);
+
   //toggleSubscription
+
   const toggleSubs = async () => {
     try {
       const response = await axios.post(
@@ -97,16 +84,14 @@ function Video() {
 
       if (response.data.message === "Subscribed successfully") {
         setIsSubscribed(true);
+        setTotalSubs((prevSubs) => prevSubs + 1);
       } else if (response.data.message === "Unsubscribed successfully") {
         setIsSubscribed(false);
+        setTotalSubs((prevSubs) => prevSubs - 1);
       }
     } catch (error) {
       console.error("Error toggling subscription:", error);
     }
-  };
-
-  const handleDownload = () => {
-    saveAs(vidURL, `${title}.mp4`);
   };
 
   const toggleLike = async () => {
@@ -127,6 +112,45 @@ function Video() {
     }
   };
 
+  useEffect(() => {
+    (async () => {
+      const response = await axios.get(
+        `http://localhost:8000/api/v1/dash/playvideo/${id}/vid/${vid}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      setTotalSubs(response.data.data[0]?.totalSub || 0);
+    })();
+  }, [isSubscribed]);
+
+  const handleDownload = () => {
+    saveAs(vidURL, `${title}.mp4`);
+  };
+  //toggle like
+
+  useEffect(() => {
+    (async () => {
+      const response = await axios.get(
+        `http://localhost:8000/api/v1/subs/playvideo/${id}/vid/${vid}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      setIsSubscribed(response.data.data)
+    })();
+  }, []);
+
+  window.addEventListener("popstate", () => {
+    window.history.back();
+  });
+
   return (
     <div>
       <Navbar />
@@ -136,14 +160,9 @@ function Video() {
             <div className="video-player">
               <video
                 src={vidURL}
-                ref={(video) => {
-                  if (video) {
-                    video.play().catch((error) => {
-                      console.error("Autoplay failed:", error);
-                    });
-                  }
-                }}
-                className="video-element w-full h-96 max-w-full mt-24 rounded-xl "
+                muted
+                autoPlay
+                className="video-element w-full h-96 max-w-full mt-24 rounded-xl"
                 controls
               >
                 Your browser does not support the video tag.

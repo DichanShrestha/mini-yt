@@ -14,9 +14,9 @@ const useVideo = async () => {
   }
 }
 
-const useVideoById = async ({ id }) => {
+const useVideoById = async ({ vid }) => {
   try {
-    const response = await axios.get(`http://localhost:8000/api/v1/videos/${id}`, {
+    const response = await axios.get(`http://localhost:8000/api/v1/videos/${vid}`, {
       withCredentials: true,
     });
     return response?.data.data;
@@ -25,9 +25,9 @@ const useVideoById = async ({ id }) => {
   }
 };
 
-const useGetVideoUser = async ({ id }) => {
+const useGetVideoUser = async ({ vid }) => {
   try {
-    const response = await axios.get(`http://localhost:8000/api/v1/videos/owner/${id}`, {
+    const response = await axios.get(`http://localhost:8000/api/v1/videos/owner/${vid}`, {
       withCredentials: true,
     });
     return response?.data.data[0];
