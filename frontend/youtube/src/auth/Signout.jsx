@@ -14,7 +14,6 @@ function Signout() {
             if (response.status === 200) {
                 navigate('/signin')
             }
-            console.log(response);
         }
         logout();
     }, [])

@@ -5,30 +5,55 @@ import { Like } from "../models/like.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
+//tala ko name change garera naya dashboard ko code lekha
 
-const getChannelSubs = asyncHandler(async (req, res) => {
+const getChannelStatistics = asyncHandler(async (req, res) => {
     const { channelId } = req.params;
-    console.log(req.params);
-    console.log(channelId, 'dash');
     if (!channelId) {
-        throw new ApiError(404, "Channel id not found")
+        throw new ApiError(404, "Channel id not found");
     }
-    const totalVideoSubs = await Subscription.aggregate(
-        [
-            {
-                '$match': {
-                    'channel': new mongoose.Types.ObjectId(channelId)
-                }
-            }, {
-                '$count': 'totalSub'
+
+    const totalVideoSubs = await Subscription.aggregate([
+        {
+            '$match': {
+                'channel': new mongoose.Types.ObjectId(channelId)
             }
-        ]
-    )
+        },
+        {
+            '$group': {
+                '_id': '$subscriber', 
+                'count': { '$sum': 1 } 
+            }
+        }
+    ]);
+
+    const totalVideoLikes = await Like.aggregate([
+        {
+            '$match': {
+                'video': new mongoose.Types.ObjectId(channelId)
+            }
+        },
+        {
+            '$group': {
+                '_id': '$video',
+                'count': { '$sum': 1 } 
+            }
+        }
+    ]);
+
+    const totalSub = totalVideoSubs.length; 
+    const totalLikes = totalVideoLikes[0].count; 
+    const result = {
+        totalSub,
+        totalLikes
+    };
 
     return res
         .status(200)
-        .json(new ApiResponse(200, totalVideoSubs, "total subs of the cid"))
-})
+        .json(new ApiResponse(200, result, "channel stats"));
+});
+
+
 
 const getChannelStats = asyncHandler(async (req, res) => {
     // TODO: Get the channel stats like total video views, total subscribers, total videos, total likes etc.
@@ -89,7 +114,6 @@ const getChannelStats = asyncHandler(async (req, res) => {
             },
         ]
     )
-    console.log(totalVideoLikes);
     const totalViews = totalVideoViews[0]?.totalViews || 0;
     const totalSubs = totalVideoSubs[0]?.totalSub || 0;
     const totalVids = totalVideos[0]?.totalVid || 0;
@@ -133,5 +157,5 @@ const getChannelVideos = asyncHandler(async (req, res) => {
 export {
     getChannelStats,
     getChannelVideos,
-    getChannelSubs
+    getChannelStatistics,
 }

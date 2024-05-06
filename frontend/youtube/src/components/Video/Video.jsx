@@ -5,70 +5,82 @@ import { useGetVideoUser, useVideoById } from "@/hook/useVideo";
 import useUser from "@/hook/useUser";
 import useVideo from "@/hook/useVideo";
 import Navbar from "../Navbar/Navbar";
-import { useUserStats } from "@/hook/useUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Textarea } from "@/components/ui/textarea";
 import { saveAs } from "file-saver";
 import axios from "axios";
 
-//subscribe gareko tarika mileko xaina
+//like gareko tarika mileko xaina, subs lai chai euta reload chaiyeko xa
 
 function Video() {
   const [totalVids, setTotalVids] = useState([]);
   const [vidURL, setVidURL] = useState("");
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [avatar, setAvatar] = useState("");
   const [username, setUsername] = useState("");
   const [totalSubs, setTotalSubs] = useState(0);
-  const [totalLikes, setTotalLikes] = useState("");
+  const [totalLikes, setTotalLikes] = useState(0);
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [videoUser, setVideoUser] = useState("");
   const [videoUserId, setVideoUserId] = useState("");
   const { id, vid } = useParams();
 
-  //videoById
+  //videoById (currently playing)
+  // Fetch video details
   useEffect(() => {
     (async () => {
-      const response = await useVideoById({ vid });
-      setVidURL(response?.videoFile);
+      try {
+        const response = await useVideoById({ vid });
+        setVidURL(response?.videoFile);
+        setTitle(response?.title);
+        setDescription(response.description);
+      } catch (error) {
+        console.error("Error fetching video details:", error);
+      }
     })();
   }, [vid]);
-  // console.log(isSubscribed);
-  //user
+
+  // Fetch user details
   useEffect(() => {
     (async () => {
-      const response = await useUser();
-      setUsername(response.data.data.username);
-      setAvatar(response.data.data.avatar);
+      try {
+        const response = await useUser();
+        setUsername(response.data.data.username);
+        setAvatar(response.data.data.avatar);
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
     })();
   }, [username]);
 
-  //video
+  // Fetch total videos
   useEffect(() => {
     (async () => {
-      const video = await useVideo();
-      setTotalVids(video);
+      try {
+        const video = await useVideo();
+        setTotalVids(video);
+      } catch (error) {
+        console.error("Error fetching total videos:", error);
+      }
     })();
   }, []);
-  //video user
+
+  // Fetch video user details
   useEffect(() => {
     (async () => {
-      const video = await useGetVideoUser({ vid });
-      setVideoUser(video?.user_details.username);
-      setVideoUserId(video?.user_details._id);
+      try {
+        const video = await useGetVideoUser({ vid });
+        setVideoUser(video?.user_details.username);
+        setVideoUserId(video?.user_details._id);
+      } catch (error) {
+        console.error("Error fetching video user details:", error);
+      }
     })();
   }, [id]);
 
-  //userStats
-  useEffect(() => {
-    (async () => {
-      const userStats = await useUserStats();
-      setTotalLikes(userStats?.totalLikes);
-    })();
-  }, [isSubscribed]);
-
-  //toggleSubscription
-
+  // Toggle subscription
   const toggleSubs = async () => {
     try {
       const response = await axios.post(
@@ -94,68 +106,86 @@ function Video() {
     }
   };
 
+  // Toggle like
   const toggleLike = async () => {
-    const response = await axios.post(
-      `http://localhost:8000/api/v1/like/toggle/v/${videoUserId}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
+    try {
+      const response = await axios.post(
+        `http://localhost:8000/api/v1/like/toggle/v/${videoUserId}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      console.log(response);
+      if (response.data.message === "Liked successfully") {
+        setIsLiked(true);
+        setTotalLikes((prevLike) => prevLike + 1);
+      } else if (response.data.message === "Unliked successfully") {
+        setIsLiked(false);
+        setTotalLikes((prevLike) => prevLike - 1);
       }
-    );
-    if (response.data.message === "Liked successfully") {
-      setIsLiked(true);
-    } else if (response.data.message === "Unliked successfully") {
-      setIsLiked(false);
+    } catch (error) {
+      console.error("Error toggling like:", error);
     }
   };
 
+  // Fetch total subs and likes
   useEffect(() => {
     (async () => {
-      const response = await axios.get(
-        `http://localhost:8000/api/v1/dash/playvideo/${id}/vid/${vid}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
-      setTotalSubs(response.data.data[0]?.totalSub || 0);
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/v1/dash/playvideo/${id}/vid/${vid}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+        setTotalSubs(response.data.data.totalSub || 0);
+        setTotalLikes(response.data.data.totalLikes);
+        console.log("likes", totalLikes);
+        console.log("subs", totalSubs);
+      } catch (error) {
+        console.error("Error fetching total subs and likes:", error);
+      }
     })();
-  }, [isSubscribed]);
+  }, [isSubscribed, isLiked]);
 
-  const handleDownload = () => {
-    saveAs(vidURL, `${title}.mp4`);
-  };
-  //toggle like
-
+  // Fetch subscription status
   useEffect(() => {
     (async () => {
-      const response = await axios.get(
-        `http://localhost:8000/api/v1/subs/playvideo/${id}/vid/${vid}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
-      setIsSubscribed(response.data.data)
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/v1/subs/playvideo/${id}/vid/${vid}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+        setIsSubscribed(response.data.data);
+      } catch (error) {
+        console.error("Error fetching subscription status:", error);
+      }
     })();
   }, []);
 
-  window.addEventListener("popstate", () => {
-    window.history.back();
-  });
+  // Handle download
+  const handleDownload = () => {
+    saveAs(vidURL, `${title}.mp4`);
+  };
 
   return (
     <div>
       <Navbar />
       <div className="flex h-screen">
-        <div className="w-3/5 flex justify-center align-middle bg-gray-100 rounded-lg">
+        <div className="w-3/5 flex justify-center align-middle rounded-lg h-full">
+          {/* yo tala ko chai video ko lagi */}
           <div>
             <div className="video-player">
               <video
@@ -173,7 +203,7 @@ function Video() {
                 <p className="text-lg font-semi-bold mb-2">{title}</p>
               </div>
 
-              <div className="w-full flex gap-3 bg-gray-200 ">
+              <div className="w-full flex gap-3">
                 <div>
                   <Avatar>
                     <AvatarImage src={avatar} />
@@ -182,7 +212,6 @@ function Video() {
                 </div>
                 <div className="flex gap-10">
                   <div className="flex flex-col">
-                    {/* tala ko mistake xa */}
                     <div className=" text-md">{videoUser}</div>
                     <div className=" text-xs">{totalSubs} subscribers</div>
                   </div>
@@ -201,7 +230,7 @@ function Video() {
                     onClick={toggleLike}
                     className="bg-blue-500 text-white px-4 py-2 rounded-3xl shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 mr-7"
                   >
-                    {totalLikes} Like
+                    {totalLikes} Likes
                   </button>
                   <button className="bg-gray-500 rounded-3xl px-4 py-2 mr-7">
                     Share
@@ -214,14 +243,26 @@ function Video() {
                   </button>
                 </div>
               </div>
+
+              <div>
+                <Textarea
+                  className="text-white mt-5 rounded-xl bg-gray-500 hover:cursor-pointer"
+                  placeholder={description}
+                />
+              </div>
             </div>
           </div>
         </div>
-        <div className="w-2/5 overflow-y-auto">
-          <div className="ml-4">
-            <h2 className="text-xl font-bold mb-4">Recommended Videos</h2>
+        {/* ya samma */}
+        {/* recommended videos code tala */}
+        <div className="w-2/5 ">
+          <div className="ml-4 mt-24">
             {totalVids.map((video) => (
-              <div key={video._id} className="flex mt-3">
+              <div
+                key={video._id}
+                onClick={() => window.location.reload()}
+                className="flex mt-3"
+              >
                 <SingleCol
                   id={video._id}
                   videoURL={video.videoFile}
