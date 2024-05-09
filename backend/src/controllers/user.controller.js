@@ -19,7 +19,7 @@ const generateAccessAndRefreshToken = async (userId) => {
     }
 }
 //done
-const registerUser = asyncHandler( async (req, res) => {
+const registerUser = asyncHandler(async (req, res) => {
     // get user details from frontend
     // validation - not empty
     // check if user already exists: username, email
@@ -31,7 +31,7 @@ const registerUser = asyncHandler( async (req, res) => {
     // return res
 
 
-    const {fullName, email, username, password } = req.body
+    const { fullName, email, username, password } = req.body
     //console.log("email: ", email);
 
     if (
@@ -56,7 +56,7 @@ const registerUser = asyncHandler( async (req, res) => {
     if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) {
         coverImageLocalPath = req.files.coverImage[0].path
     }
-    
+
 
     if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar file is required")
@@ -68,13 +68,13 @@ const registerUser = asyncHandler( async (req, res) => {
     if (!avatar) {
         throw new ApiError(400, "Avatar file is required")
     }
-   
+
 
     const user = await User.create({
         fullName,
         avatar: avatar.url,
         coverImage: coverImage?.url || "",
-        email, 
+        email,
         password,
         username: username.toLowerCase()
     })
@@ -91,7 +91,7 @@ const registerUser = asyncHandler( async (req, res) => {
         new ApiResponse(200, createdUser, "User registered Successfully")
     )
 
-} )
+})
 //done
 const loginUser = asyncHandler(async (req, res) => {
     // req body -> data
@@ -127,7 +127,7 @@ const loginUser = asyncHandler(async (req, res) => {
         httpOnly: true,
         secure: req.secure || req.headers['x-forwarded-proto'] === 'https'
     }
-    
+
     return res
         .status(200)
         .cookie("accessToken", accessToken, options)
@@ -278,8 +278,8 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         { new: true }
     ).select("-password")
     return res
-    .status(200) 
-    .json(new ApiResponse(200, user, "Avatar updated successfully"))
+        .status(200)
+        .json(new ApiResponse(200, user, "Avatar updated successfully"))
 })
 
 const updateUserCoverImage = asyncHandler(async (req, res) => {
@@ -306,8 +306,8 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
     ).select("-password")
 
     return res
-    .status(200) 
-    .json(new ApiResponse(200, user, "Cover Image updated successfully"))
+        .status(200)
+        .json(new ApiResponse(200, user, "Cover Image updated successfully"))
 })
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
@@ -348,7 +348,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
                     },
                     isSubscribed: {
                         $cond: {
-                            if: {$in: [req.user?._id, "$subscribers.subscriber"]},
+                            if: { $in: [req.user?._id, "$subscribers.subscriber"] },
                             then: true,
                             else: false
                         }
@@ -372,8 +372,8 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
             throw new ApiError(404, "Channel does not exists")
         }
         return res
-        .status(200)
-        .json(new ApiResponse(200, channel[0], "User channel fetched successfully"))
+            .status(200)
+            .json(new ApiResponse(200, channel[0], "User channel fetched successfully"))
     }
 })
 
@@ -400,7 +400,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
                             pipeline: [
                                 {
                                     $project: {
-                                        fullName:1,
+                                        fullName: 1,
                                         username: 1,
                                         avatar: 1
                                     }
@@ -421,12 +421,26 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     ])
 
     return res
+        .status(200)
+        .json(new ApiResponse(
+            200,
+            user[0].watchHistory,
+            "Watch history fetched successfully"
+        ))
+})
+
+const getUserById = asyncHandler(async (req, res) => {
+    const { uid } = req.body;
+    if (!uid) {
+        throw new ApiError(404, "user id not found")
+    }
+    const result = await User.findById(uid);
+    if (!result) {
+        throw new ApiError(501, "Internal error while getting user")
+    }
+    return res
     .status(200)
-    .json(new ApiResponse(
-        200,
-        user[0].watchHistory,
-        "Watch history fetched successfully"
-    ))
+    .json(new ApiResponse(200, result, "User retrieved by id"))
 })
 
 
@@ -443,4 +457,5 @@ export {
     updateUserCoverImage,
     getUserChannelProfile,
     getWatchHistory,
+    getUserById
 }

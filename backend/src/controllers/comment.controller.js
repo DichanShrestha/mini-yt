@@ -5,6 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { Video } from "../models/video.model.js"
 
+//done
 const getVideoComments = asyncHandler(async (req, res) => {
     //TODO: get all comments for a video
     const { videoId } = req.params
@@ -14,6 +15,34 @@ const getVideoComments = asyncHandler(async (req, res) => {
         {
             $match: {
                 video: new mongoose.Types.ObjectId(videoId)
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: 'commentator'
+            }
+        },
+        {
+            $addFields: {
+                commentator: {
+                    $arrayElemAt: ['$commentator', 0]
+                }
+            }
+        },
+        {
+            $project: {
+                "commentator.email": 0,
+                "commentator.fullName": 0,
+                "commentator.coverImage": 0,
+                "commentator.password": 0,
+                "commentator.createdAt": 0,
+                "commentator.updatedAt": 0,
+                "commentator.refreshToken": 0,
+                "commentator.watchHistory": 0,
+                "commentator.__v": 0,
             }
         },
         {
@@ -30,11 +59,12 @@ const getVideoComments = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Internal server error while aggregating")
     }
     return res
-    .status(200)
-    .json(new ApiResponse(200, result, "comments retrieved successfully"))
+        .status(200)
+        .json(new ApiResponse(200, result, "comments retrieved successfully"))
 
 })
 
+//done
 const addComment = asyncHandler(async (req, res) => {
     // TODO: add a comment to a video
     const { content } = req.body;
@@ -46,7 +76,7 @@ const addComment = asyncHandler(async (req, res) => {
     const comment = await Comment.create({
         content,
         video: video._id,
-        owner: video.owner
+        owner: req.user._id
     })
 
     return res

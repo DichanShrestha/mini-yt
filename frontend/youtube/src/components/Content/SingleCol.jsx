@@ -39,7 +39,7 @@ function SingleCol({id, videoURL, title, views, time, thumbnailURL }) {
   return (
     <div className="flex gap-5">
       <div className="w-60 h-36" onClick={handleClick}>
-        <Link to={`/playvideo/${uid}/vid${id}`}>
+        <Link to={`/playvideo/${uid}/vid/${id}`}>
           <img
             src={thumbnailURL}
             className="w-full h-full rounded-2xl"

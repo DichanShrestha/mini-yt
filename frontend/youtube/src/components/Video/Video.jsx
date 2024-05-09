@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { saveAs } from "file-saver";
 import axios from "axios";
+import Comment from "@/utils/Comment";
 
 //like gareko tarika mileko xaina, subs lai chai euta reload chaiyeko xa
 
@@ -147,8 +148,6 @@ function Video() {
         );
         setTotalSubs(response.data.data.totalSub || 0);
         setTotalLikes(response.data.data.totalLikes);
-        console.log("likes", totalLikes);
-        console.log("subs", totalSubs);
       } catch (error) {
         console.error("Error fetching total subs and likes:", error);
       }
@@ -249,6 +248,10 @@ function Video() {
                   className="text-white mt-5 rounded-xl bg-gray-500 hover:cursor-pointer"
                   placeholder={description}
                 />
+              </div>
+
+              <div>
+                <Comment videoId={vid}/>
               </div>
             </div>
           </div>

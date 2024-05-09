@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
     changeCurrentPassword,
     getCurrentUser,
+    getUserById,
     getUserChannelProfile,
     getWatchHistory,
     loginUser,
@@ -49,5 +50,6 @@ router.route("/cover-image").post(verifyJWT, upload.single("coverImage"), update
 router.route("/c/:username").get(verifyJWT, getUserChannelProfile)
 
 router.route("/history").get(verifyJWT, getWatchHistory)
+
 
 export default router;
