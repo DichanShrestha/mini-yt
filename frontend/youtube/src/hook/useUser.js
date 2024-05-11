@@ -10,7 +10,6 @@ const useUser = async () => {
         });
         return response;
     } catch (error) {
-        console.log(error, "error while retrieving user");
         throw error;
     }    
 }

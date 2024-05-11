@@ -4,13 +4,20 @@ import useUser from "@/hook/useUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 function Comment({ videoId }) {
   const [totalComment, setTotalComment] = useState([]);
   const [comment, setComment] = useState("");
   const [avatar, setAvatar] = useState(null);
+  const [hoveredComment, setHoveredComment] = useState(null);
 
-  //current user
+  // Fetch current user data
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -23,6 +30,7 @@ function Comment({ videoId }) {
     fetchUser();
   }, []);
 
+  // Add comment to the video
   const addComment = async () => {
     const content = { content: comment };
     try {
@@ -42,24 +50,33 @@ function Comment({ videoId }) {
     }
   };
 
-  //total comment
+  // Fetch comments for the video
   useEffect(() => {
-    (async () => {
-      const response = await axios.get(
-        `http://localhost:8000/api/v1/comments/${videoId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
-      setTotalComment(response.data.data);
-    })();
-  }, []);
+    const fetchComments = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/v1/comments/${videoId}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+        setTotalComment(response.data.data);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
+    };
+    fetchComments();
+  }, [videoId]);
 
   return (
     <div>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+      />
       <p className="my-3">{totalComment.length} Comments</p>
       <div className="flex gap-3">
         <div>
@@ -96,21 +113,44 @@ function Comment({ videoId }) {
           </div>
         </div>
       </div>
-
       <div>
         {totalComment.map((item) => (
-          <div key={item._id} className="flex gap-3 my-3">
+          <div
+            key={item._id}
+            className="flex gap-3 my-3"
+            onMouseEnter={() => setHoveredComment(item._id)}
+            onMouseLeave={() => setHoveredComment(null)}
+          >
             <div>
               <Avatar>
                 <AvatarImage
-                  className="w-11 h-10"
+                  className="w-11 h-10 cursor-pointer"
                   src={item.commentator.avatar}
                 />
                 <AvatarFallback>avatar</AvatarFallback>
               </Avatar>
             </div>
-            <div>
-              <div>{item.commentator.username}</div>
+            <div className="w-full">
+              <div className="flex justify-between">
+                <p className="cursor-pointer h-8">
+                  {item.commentator.username}
+                </p>
+                {(hoveredComment === item._id ) && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      <span
+                        className="cursor-pointer material-symbols-outlined"
+                      >
+                        more_vert
+                      </span>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem>Edit</DropdownMenuItem>
+                      <DropdownMenuItem>Update</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
+              </div>
               <div>{item.content}</div>
             </div>
           </div>

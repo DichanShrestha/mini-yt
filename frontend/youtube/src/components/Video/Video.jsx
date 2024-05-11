@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import SingleCol from "../Content/SingleCol";
 import { useGetVideoUser, useVideoById } from "@/hook/useVideo";
 import useUser from "@/hook/useUser";
@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { saveAs } from "file-saver";
 import axios from "axios";
 import Comment from "@/utils/Comment";
+import VideoUtils from "@/utils/VideoUtils";
 
 //like gareko tarika mileko xaina, subs lai chai euta reload chaiyeko xa
 
@@ -27,8 +28,8 @@ function Video() {
   const [videoUser, setVideoUser] = useState("");
   const [videoUserId, setVideoUserId] = useState("");
   const { id, vid } = useParams();
+  const navigate = useNavigate()
 
-  //videoById (currently playing)
   // Fetch video details
   useEffect(() => {
     (async () => {
@@ -203,13 +204,13 @@ function Video() {
               </div>
 
               <div className="w-full flex gap-3">
-                <div>
-                  <Avatar>
+                <div>{/*tala ko logic ali mildaina */}
+                  <Avatar onClick={() => navigate('/yourchannel')}>
                     <AvatarImage src={avatar} />
                     <AvatarFallback>avatar</AvatarFallback>
                   </Avatar>
                 </div>
-                <div className="flex gap-10">
+                <div className="flex gap-7">
                   <div className="flex flex-col">
                     <div className=" text-md">{videoUser}</div>
                     <div className=" text-xs">{totalSubs} subscribers</div>
@@ -224,7 +225,9 @@ function Video() {
                   </div>
                 </div>
 
-                <div className="ml-24">
+                <VideoUtils vid={vid} id={id}/>
+
+                <div className="ml-16">
                   <button
                     onClick={toggleLike}
                     className="bg-blue-500 text-white px-4 py-2 rounded-3xl shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 mr-7"
@@ -251,7 +254,7 @@ function Video() {
               </div>
 
               <div>
-                <Comment videoId={vid}/>
+                <Comment videoId={vid} />
               </div>
             </div>
           </div>

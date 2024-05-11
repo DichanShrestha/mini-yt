@@ -14,20 +14,24 @@ function Navbar() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(true);
+  const [isSignedIn, setIsSignedIn] = useState(false);
+
   let userAvatar;
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const userData = await useUser();
         setUser(userData);
+        setIsSignedIn(true);
       } catch (error) {
         console.error("Error while fetching user:", error);
+        setIsSignedIn(false);
       }
     };
 
     fetchUser();
   }, []);
-  userAvatar = user?.data.data.avatar
+  userAvatar = user?.data.data.avatar;
   const navigateToSignIn = () => {
     navigate("/signin");
   };
@@ -58,7 +62,7 @@ function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
-              <Link to='/'>
+              <Link to="/">
                 <img
                   className="h-8 w-auto"
                   src="https://www.gstatic.com/youtube/img/branding/youtubelogo/svg/youtubelogo.svg"
@@ -108,12 +112,14 @@ function Navbar() {
                 </svg>
               </div>
             </div>
-            <button
-              onClick={navigateToSignIn}
-              className="ml-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-full text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:border-red-700 focus:ring-red active:bg-red-700 transition ease-in-out duration-150"
-            >
-              Sign in
-            </button>
+            {!isSignedIn && (
+              <button
+                onClick={navigateToSignIn}
+                className="ml-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-full text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:border-red-700 focus:ring-red active:bg-red-700 transition ease-in-out duration-150"
+              >
+                Sign in
+              </button>
+            )}
             <div
               id="img"
               className="relative ml-3"
