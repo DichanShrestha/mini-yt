@@ -112,7 +112,6 @@ function YourChannel() {
         withCredentials: true,
       }
     );
-    console.log(response);
   };
 
   return (
@@ -177,10 +176,10 @@ function YourChannel() {
                     Create
                   </button>
                 </DialogTrigger>
-                <DialogContent className="p-10">
+                <DialogContent className='bg-slate-800 p-8 text-white'>
                   <DialogHeader>
                     <DialogTitle className="text-xl font-semibold mb-4">
-                      Are you absolutely sure?
+                      Add your video
                     </DialogTitle>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="flex flex-col">

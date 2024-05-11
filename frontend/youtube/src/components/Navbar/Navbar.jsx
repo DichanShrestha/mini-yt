@@ -9,12 +9,28 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import useUser from "@/hook/useUser";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@radix-ui/react-dropdown-menu";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Button } from "../ui/button";
+import axios from "axios";
 
 function Navbar() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(true);
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [title, setTitle] = useState("");
+  const [desc, setDesc] = useState("");
+  const [thumbnail, setThumbnail] = useState("");
+  const [video, setVideo] = useState("");
 
   let userAvatar;
   useEffect(() => {
@@ -56,8 +72,35 @@ function Navbar() {
     };
   }, [dropdownOpen]);
 
+  const publishAVideo = async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", desc);
+    formData.append("thumbnail", thumbnail);
+    formData.append("videoFile", video);
+    console.log(formData);
+
+    const response = await axios.post(
+      "http://localhost:8000/api/v1/videos",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      }
+    );
+    console.log(response);
+  };
+
   return (
     <nav className="bg-white shadow-lg fixed top-0 w-full z-50">
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+      />
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -120,6 +163,74 @@ function Navbar() {
                 Sign in
               </button>
             )}
+
+            <Dialog>
+              <DialogTrigger>
+                <span className="mx-2 material-symbols-outlined">
+                  video_call
+                </span>
+              </DialogTrigger>
+              <DialogContent className="bg-slate-800 p-8 text-white">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-semibold mb-4">
+                    Add your video
+                  </DialogTitle>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col">
+                      <Label htmlFor="title" className="mb-1">
+                        Title
+                      </Label>
+                      <Input
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        type="text"
+                        id="title"
+                        className="p-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                      />
+                      <Label htmlFor="desc" className="mt-4 mb-1">
+                        Description
+                      </Label>
+                      <Textarea
+                        disabled={false}
+                        value={desc}
+                        onChange={(e) => setDesc(e.target.value)}
+                        id="desc"
+                        className="p-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                      ></Textarea>
+                    </div>
+                    <div>
+                      <Label htmlFor="thumbnail" className="mb-1">
+                        Thumbnail
+                      </Label>
+                      <Input
+                        onChange={(e) => setThumbnail(e.target.files[0])}
+                        type="file"
+                        id="thumbnail"
+                        className="p-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                      />
+                      <Label htmlFor="video" className="mt-4 mb-1">
+                        Video
+                      </Label>
+                      <Input
+                        onChange={(e) => setVideo(e.target.files[0])}
+                        type="file"
+                        id="video"
+                        className="p-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <Button
+                        type="submit"
+                        onClick={publishAVideo}
+                        className="bg-slate-200 text-black hover:bg-slate-300 hover:text-black"
+                      >
+                        Add
+                      </Button>
+                    </div>
+                  </div>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
             <div
               id="img"
               className="relative ml-3"
