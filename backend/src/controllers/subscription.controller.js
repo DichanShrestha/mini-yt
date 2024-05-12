@@ -64,18 +64,39 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
-    const { subscriberId } = req.params;
-
+    const { channelId } = req.params;
+    if (!isValidObjectId(channelId)) {
+        throw new ApiError(400, "channel id is not valid object id")
+    }
     const pipeline = [
         {
-            $match: {
-                subscriber: new mongoose.Types.ObjectId(subscriberId)
+          '$match': {
+            'channel': new mongoose.Types.ObjectId(channelId)
+          }
+        }, {
+          '$lookup': {
+            'from': 'videos', 
+            'localField': 'subscriber', 
+            'foreignField': 'owner', 
+            'as': 'videoByChannel'
+          }
+        }, {
+          '$lookup': {
+            'from': 'users', 
+            'localField': 'subscriber', 
+            'foreignField': '_id', 
+            'as': 'username'
+          }
+        }, {
+          '$addFields': {
+            'username': {
+              '$arrayElemAt': [
+                '$username', 0
+              ]
             }
-        },
-        {
-            $count: 'channelCount'
+          }
         }
-    ]
+      ]
     const result = await Subscription.aggregate(pipeline)
     if (!result) {
         throw new ApiError(500, "Error while getting channel data")
@@ -107,8 +128,8 @@ const checkIfSubscribed = asyncHandler(async (req, res) => {
     const isSubscribed = result.length > 0
 
     return res
-    .status(200)
-    .json(new ApiResponse(200, isSubscribed, "subscription checked"))
+        .status(200)
+        .json(new ApiResponse(200, isSubscribed, "subscription checked"))
 })
 
 export {

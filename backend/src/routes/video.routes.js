@@ -38,9 +38,9 @@ router
     .get(getVideoById)
     .delete(deleteVideo)
     .patch(upload.single("thumbnail"), updateVideo)
-    // .patch(incrementViewCount);
 router.route("/toggle/publish/:videoId").patch(togglePublishStatus);
 router.route('/owner/:videoId').get(getVideoOwner)
+router.route('/views').post(incrementViewCount)
 
 
 

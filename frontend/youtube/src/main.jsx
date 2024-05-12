@@ -11,6 +11,7 @@ import Signout from './auth/Signout.jsx';
 import ForgotPass from './utils/ForgotPass.jsx';
 import YourChannel from './components/YourChannel/YourChannel.jsx';
 import Video from './components/Video/Video.jsx';
+import Subscriptions from './components/Subscriptions/Subscriptions.jsx';
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
   {
     path: '/playvideo/:id/vid/:vid',
     element: <Video />
+  },
+  {
+    path: '/subscriptions/:channelId',
+    element: <Subscriptions />
   }
 ])
 

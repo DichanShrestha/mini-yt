@@ -23,12 +23,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
     let pipeline = [];
 
-    // pipeline.push({
-    //     $match: {
-    //         _id: mongoose.Types.ObjectId(userId)
-    //     }
-    // })
-
     if (query) {
         pipeline.push({
             $match: {
@@ -93,7 +87,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
 })
 
 const incrementViewCount = asyncHandler(async (req, res) => {
-    const { videoId } = req.params;
+    const { videoId } = req.body;
     const updatedVideo = await Video.findByIdAndUpdate(
         videoId,
         { $inc: { views: 1 } },
@@ -178,7 +172,6 @@ const getVideoOwner = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, result, "video owner retrieved successfully"))
 })
 
-
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
     //TODO: update video details like title, description, thumbnail
@@ -247,6 +240,7 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
         .status(200)
         .json(new ApiResponse(200, publishStatus, "toggled sucessfully"))
 })
+
 
 export {
     getAllVideos,

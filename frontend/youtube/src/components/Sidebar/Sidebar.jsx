@@ -1,7 +1,16 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import Elem from "./Elem";
+import useUser from "@/hook/useUser";
 
 function Sidebar() {
+  const [channelId, setChannelId] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      const data = await useUser();
+      setChannelId(data.data.data._id);
+    })();
+  }, []);
   const landingArr = [
     {
       picName: "home",
@@ -11,7 +20,7 @@ function Sidebar() {
     {
       picName: "subscriptions",
       name: "Subscriptions",
-      linkTo: "/subscriptions",
+      linkTo: `/subscriptions/${channelId}`,
     },
   ];
   const youArr = [
