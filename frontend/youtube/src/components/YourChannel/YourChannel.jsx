@@ -13,6 +13,8 @@ import { Label } from "@radix-ui/react-dropdown-menu";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import Content from "../Content/Content";
+import Navbar from "../Navbar/Navbar";
+import Sidebar from "../Sidebar/Sidebar";
 
 function YourChannel() {
   const [userData, setUserData] = useState(null);
@@ -115,7 +117,10 @@ function YourChannel() {
   };
 
   return (
-    <div className="h-screen w-screen pl-64 pt-36">
+    <div>
+      <Navbar />
+      <Sidebar />
+      <div className="h-screen w-screen pl-64 pt-20">
       <div className="flex gap-10 pt-10">
         <div>
           <Dialog>
@@ -254,6 +259,7 @@ function YourChannel() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

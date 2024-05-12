@@ -16,12 +16,10 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
-    children: [
-      {
-        path: '/yourchannel',
-        element: <YourChannel />
-      }
-    ]
+  },
+  {
+    path: '/yourchannel',
+    element: <YourChannel />
   },
   {
     path: '/signin',

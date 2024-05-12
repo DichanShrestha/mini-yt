@@ -1,17 +1,63 @@
-import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import React from "react";
+import Elem from "./Elem";
 
 function Sidebar() {
+  const landingArr = [
+    {
+      picName: "home",
+      name: "Home",
+      linkTo: "/",
+    },
+    {
+      picName: "subscriptions",
+      name: "Subscriptions",
+      linkTo: "/subscriptions",
+    },
+  ];
+  const youArr = [
+    {
+      picName: "switch_account",
+      name: "Your channel",
+      linkTo: "/yourchannel",
+    },
+    {
+      picName: "history",
+      name: "History",
+      linkTo: "/history",
+    },
+    {
+      picName: "playlist_play",
+      name: "Playlist",
+      linkTo: "/playlist",
+    },
+    {
+      picName: "thumb_up",
+      name: "Liked Videos",
+      linkTo: "/likedvideos",
+    },
+  ];
   return (
-    <div className="h-full fixed bg-gray-100 w-1/6 text-black p-4 mt-16 ">
-      <h3 className="text-2xl font-bold mb-4">You</h3>
-      <div className="flex flex-col space-y-2">
-        <NavLink to='/yourchannel' className={({isActive}) => `transition-colors ${isActive? 'bg-gray-300' : ''} duration-300`}>Your Channel</NavLink>
-        <Link className="transition-colors duration-300" to="/history">History</Link>
-        <Link className="transition-colors duration-300" to="/playlist">Playlist</Link>
-        <Link className="transition-colors duration-300" to="/your-videos">Your Videos</Link>
-        <Link className="transition-colors duration-300" to="/liked-videos">Liked Videos</Link>
-      </div> 
+    <div className="h-screen fixed w-1/6 p-4 overflow-y-auto mt-16">
+      {landingArr.map((item) => (
+        <div className="mb-2">
+          <Elem picName={item.picName} name={item.name} link={item.linkTo} />
+        </div>
+      ))}
+
+      <hr className="border-b-1 border-gray-400" />
+
+      {youArr.map((item) => (
+        <div className="mt-2">
+          <Elem picName={item.picName} name={item.name} link={item.linkTo} />
+        </div>
+      ))}
+
+      <hr className="border-b-1 border-gray-400 mt-2" />
+      <footer className=" text-sm mt-2">
+        About Press Copyright Contact us Creators Advertise Developers Terms
+        Privacy Policy & Safety How YouTube works Test new features © 2024
+        Google LLC
+      </footer>
     </div>
   );
 }

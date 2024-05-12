@@ -47,7 +47,7 @@ function Content({ id, videoURL, title, views, time, thumbnailURL }) {
   };
 
   return (
-    <div className="flex flex-col mt-28">
+    <div className="flex flex-col">
       <div
         className="relative w-80 h-52"
         onMouseEnter={handleMouseOver}
