@@ -95,19 +95,29 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     //TODO: get all liked videos
     const result = await Like.aggregate([
         {
-            $match: {
-                video: {
-                    '$exists': true
-                }
+          '$match': {
+            'video': {
+              '$exists': true
+            }, 
+            'likedBy': new mongoose.Types.ObjectId(req.user._id)
+          }
+        }, {
+          '$lookup': {
+            'from': 'videos', 
+            'localField': 'video', 
+            'foreignField': '_id', 
+            'as': 'video'
+          }
+        }, {
+          '$addFields': {
+            'video': {
+              '$arrayElemAt': [
+                '$video', 0
+              ]
             }
-        },
-        {
-            $project: {
-                createdAt: 0,
-                updatedAt: 0
-            }
+          }
         }
-    ])
+      ])
     if (!result) {
         throw new ApiError(500, "Can't find liked videos")
     }

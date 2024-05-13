@@ -1,3 +1,4 @@
+import useHistory from "@/hook/useHistory";
 import useIncrementView from "@/hook/useIncrementView";
 import { useGetVideoUser } from "@/hook/useVideo";
 import React, { useEffect, useState, useRef } from "react";
@@ -34,7 +35,8 @@ function Content({ id, videoURL, title, views, time, thumbnailURL }) {
   }, []);
 
   const handleClick = () => {
-    useIncrementView({videoId: id})
+    useHistory({ videoId: id });
+    useIncrementView({ videoId: id });
     navigate(`/playvideo/${uid}/vid/${id}`);
   };
 

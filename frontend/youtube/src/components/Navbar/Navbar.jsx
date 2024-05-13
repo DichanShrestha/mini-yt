@@ -33,6 +33,7 @@ function Navbar() {
   const [video, setVideo] = useState("");
 
   let userAvatar;
+  let data;
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -95,6 +96,7 @@ function Navbar() {
     console.log(response);
   };
 
+
   return (
     <nav className="bg-white shadow-lg fixed top-0 w-full z-50">
       <link
@@ -113,48 +115,13 @@ function Navbar() {
                 />
               </Link>
             </div>
-            <div className="hidden sm:-my-px sm:ml-6 sm:flex sm:space-x-8">
-              <a
-                href="#"
-                className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-900 hover:text-gray-500 hover:border-gray-500 focus:outline-none focus:text-gray-500 focus:border-gray-500"
-              >
-                Home
-              </a>
-              <a
-                href="#"
-                className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-900 hover:text-gray-500 hover:border-gray-500 focus:outline-none focus:text-gray-500 focus:border-gray-500"
-              >
-                Trending
-              </a>
-              <a
-                href="#"
-                className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-900 hover:text-gray-500 hover:border-gray-500 focus:outline-none focus:text-gray-500 focus:border-gray-500"
-              >
-                Subscriptions
-              </a>
-            </div>
           </div>
+
+          <div className="relative flex py-3 w-96">
+            <Input />
+          </div>
+
           <div className="hidden sm:flex sm:items-center sm:ml-6">
-            <div className="relative">
-              <input
-                type="text"
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-gray-100 placeholder-gray-500 focus:outline-none focus:ring focus:ring-indigo-200 focus:border-indigo-500 transition duration-150 ease-in-out sm:text-sm sm:leading-5"
-                placeholder="Search"
-              />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg
-                  className="h-5 w-5 text-gray-400"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path d="M21 21l-6-6m2-3a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-              </div>
-            </div>
             {!isSignedIn && (
               <button
                 onClick={navigateToSignIn}

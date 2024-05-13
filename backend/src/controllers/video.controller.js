@@ -17,9 +17,6 @@ const getAllVideos = asyncHandler(async (req, res) => {
     //TODO: get all videos based on query, sort, pagination
     Video.schema.plugin(mongooseAggregatePaginate);
 
-    // if (!isValidObjectId(userId)) {
-    //     throw new ApiError("404", "User id not found");
-    // }
 
     let pipeline = [];
 

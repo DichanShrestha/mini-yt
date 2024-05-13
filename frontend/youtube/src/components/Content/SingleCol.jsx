@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useGetVideoUser } from "@/hook/useVideo";
+import useIncrementView from "@/hook/useIncrementView";
+import useHistory from "@/hook/useHistory";
 
 function SingleCol({id, videoURL, title, views, time, thumbnailURL }) {
   const [exactTime, setExactTime] = useState(0);
@@ -33,6 +35,8 @@ function SingleCol({id, videoURL, title, views, time, thumbnailURL }) {
   }, [])
 
   const handleClick = () => {
+    useHistory({ videoId: id })
+    useIncrementView({videoId: id})
     navigate(`/playvideo/${uid}/vid/${id}`);
   };
 

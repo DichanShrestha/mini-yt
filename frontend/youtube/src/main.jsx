@@ -12,6 +12,8 @@ import ForgotPass from './utils/ForgotPass.jsx';
 import YourChannel from './components/YourChannel/YourChannel.jsx';
 import Video from './components/Video/Video.jsx';
 import Subscriptions from './components/Subscriptions/Subscriptions.jsx';
+import LikeVideo from './utils/LikeVideo.jsx';
+import History from './components/History/History.jsx';
 
 const router = createBrowserRouter([
   {
@@ -53,6 +55,14 @@ const router = createBrowserRouter([
   {
     path: '/subscriptions/:channelId',
     element: <Subscriptions />
+  },
+  {
+    path: '/likedvideos',
+    element: <LikeVideo />
+  },
+  {
+    path: '/history',
+    element: <History />
   }
 ])
 

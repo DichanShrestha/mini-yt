@@ -112,7 +112,7 @@ function Video() {
   const toggleLike = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:8000/api/v1/like/toggle/v/${videoUserId}`,
+        `http://localhost:8000/api/v1/like/toggle/v/${vid}`,
         {},
         {
           headers: {
@@ -121,7 +121,6 @@ function Video() {
           withCredentials: true,
         }
       );
-      console.log(response);
       if (response.data.message === "Liked successfully") {
         setIsLiked(true);
         setTotalLikes((prevLike) => prevLike + 1);

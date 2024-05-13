@@ -8,7 +8,7 @@ import { asyncHandler } from "../utils/asyncHandler.js"
 //tala ko name change garera naya dashboard ko code lekha
 
 const getChannelStatistics = asyncHandler(async (req, res) => {
-    const { channelId } = req.params;
+    const { channelId, videoId } = req.params;
     if (!channelId) {
         throw new ApiError(404, "Channel id not found");
     }
@@ -30,7 +30,7 @@ const getChannelStatistics = asyncHandler(async (req, res) => {
     const totalVideoLikes = await Like.aggregate([
         {
             '$match': {
-                'video': new mongoose.Types.ObjectId(channelId)
+                'video': new mongoose.Types.ObjectId(videoId)
             }
         },
         {
@@ -40,9 +40,8 @@ const getChannelStatistics = asyncHandler(async (req, res) => {
             }
         }
     ]);
-
     const totalSub = totalVideoSubs.length; 
-    const totalLikes = totalVideoLikes[0].count; 
+    const totalLikes = totalVideoLikes[0]?.count; 
     const result = {
         totalSub,
         totalLikes

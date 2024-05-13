@@ -4,7 +4,7 @@ import { User } from '../models/user.model.js'
 import { uploadOnCloudinary } from '../utils/cloudinary.js'
 import { ApiResponse } from '../utils/ApiResponse.js';
 import jwt from 'jsonwebtoken'
-import mongoose from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 //not req
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -377,6 +377,42 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     }
 })
 
+const addToWatchHistory = asyncHandler(async (req, res) => {
+    const { videoId } = req.body;
+    const userId = req.user._id;
+
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(404, "video id not found")
+    }
+
+    try {
+
+        const user = await User.findById(userId);
+
+        if (user.watchHistory.includes(videoId)) {
+            return res
+            .status(200)
+            .json(new ApiResponse(200, user, "Video Already in history"))
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $addToSet: { watchHistory: videoId } },
+            { new: true }
+        );
+        if (!updatedUser) {
+            throw new ApiError(500, "Server error while updating watch history")
+        }
+
+        return res
+        .status(200)
+        .json(new ApiResponse(200, updatedUser, "Added to watch History"))
+
+    } catch (error) {
+        throw new ApiError(500, "Error while adding to watch history")
+    }
+})
+
 const getWatchHistory = asyncHandler(async (req, res) => {
     const user = await User.aggregate([
         {
@@ -429,22 +465,6 @@ const getWatchHistory = asyncHandler(async (req, res) => {
         ))
 })
 
-const getUserById = asyncHandler(async (req, res) => {
-    const { uid } = req.body;
-    if (!uid) {
-        throw new ApiError(404, "user id not found")
-    }
-    const result = await User.findById(uid);
-    if (!result) {
-        throw new ApiError(501, "Internal error while getting user")
-    }
-    return res
-    .status(200)
-    .json(new ApiResponse(200, result, "User retrieved by id"))
-})
-
-
-
 export {
     registerUser,
     loginUser,
@@ -457,5 +477,5 @@ export {
     updateUserCoverImage,
     getUserChannelProfile,
     getWatchHistory,
-    getUserById
+    addToWatchHistory
 }
