@@ -51,7 +51,7 @@ function SingleCol({id, videoURL, title, views, time, thumbnailURL }) {
           />
         </Link>
       </div>
-      <div className="mt-2">
+      <div className="mt-2 w-48">
         <p className="text-lg font-medium">{title}</p>
         <p className="text-xs text-gray-500">
           {views} views ‧ {exactTime}

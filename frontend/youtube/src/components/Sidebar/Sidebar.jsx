@@ -13,11 +13,13 @@ function Sidebar() {
   }, []);
   const landingArr = [
     {
+      id: 1,
       picName: "home",
       name: "Home",
       linkTo: "/",
     },
     {
+      id: 2,
       picName: "subscriptions",
       name: "Subscriptions",
       linkTo: `/subscriptions/${channelId}`,
@@ -25,21 +27,25 @@ function Sidebar() {
   ];
   const youArr = [
     {
+      id: 3,
       picName: "switch_account",
       name: "Your channel",
       linkTo: "/yourchannel",
     },
     {
+      id: 4,
       picName: "history",
       name: "History",
       linkTo: "/history",
     },
     {
+      id: 5,
       picName: "playlist_play",
       name: "Playlist",
       linkTo: "/playlist",
     },
     {
+      id: 6,
       picName: "thumb_up",
       name: "Liked Videos",
       linkTo: "/likedvideos",
@@ -48,7 +54,7 @@ function Sidebar() {
   return (
     <div className="h-screen fixed w-1/6 p-4 overflow-y-auto mt-16">
       {landingArr.map((item) => (
-        <div className="mb-2">
+        <div key={item.id} className="mb-2">
           <Elem picName={item.picName} name={item.name} link={item.linkTo} />
         </div>
       ))}
@@ -56,11 +62,15 @@ function Sidebar() {
       <hr className="border-b-1 border-gray-400" />
 
       {youArr.map((item) => (
-        <div className="mt-2">
+        <div key={item.id} className="mt-2">
           <Elem picName={item.picName} name={item.name} link={item.linkTo} />
         </div>
       ))}
 
+      <hr className="border-b-1 border-gray-400 mt-2" />
+      <div className="pt-2">
+      <Elem picName="group" name='Community' link='/community'/>
+      </div>
       <hr className="border-b-1 border-gray-400 mt-2" />
       <footer className=" text-sm mt-2">
         About Press Copyright Contact us Creators Advertise Developers Terms

@@ -14,6 +14,7 @@ import Video from './components/Video/Video.jsx';
 import Subscriptions from './components/Subscriptions/Subscriptions.jsx';
 import LikeVideo from './utils/LikeVideo.jsx';
 import History from './components/History/History.jsx';
+import Community from './components/Community/Community.jsx';
 
 const router = createBrowserRouter([
   {
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
   {
     path: '/history',
     element: <History />
+  },
+  {
+    path: '/community',
+    element: <Community />
   }
 ])
 

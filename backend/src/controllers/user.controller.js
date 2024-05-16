@@ -5,6 +5,7 @@ import { uploadOnCloudinary } from '../utils/cloudinary.js'
 import { ApiResponse } from '../utils/ApiResponse.js';
 import jwt from 'jsonwebtoken'
 import mongoose, { isValidObjectId } from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 //not req
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -32,7 +33,6 @@ const registerUser = asyncHandler(async (req, res) => {
 
 
     const { fullName, email, username, password } = req.body
-    //console.log("email: ", email);
 
     if (
         [fullName, email, username, password].some((field) => field?.trim() === "")
@@ -47,7 +47,6 @@ const registerUser = asyncHandler(async (req, res) => {
     if (existedUser) {
         throw new ApiError(409, "User with email or username already exists")
     }
-    //console.log(req.files);
 
     const avatarLocalPath = req.files?.avatar[0]?.path;
     //const coverImageLocalPath = req.files?.coverImage[0]?.path;
@@ -391,8 +390,8 @@ const addToWatchHistory = asyncHandler(async (req, res) => {
 
         if (user.watchHistory.includes(videoId)) {
             return res
-            .status(200)
-            .json(new ApiResponse(200, user, "Video Already in history"))
+                .status(200)
+                .json(new ApiResponse(200, user, "Video Already in history"))
         }
 
         const updatedUser = await User.findByIdAndUpdate(
@@ -405,8 +404,8 @@ const addToWatchHistory = asyncHandler(async (req, res) => {
         }
 
         return res
-        .status(200)
-        .json(new ApiResponse(200, updatedUser, "Added to watch History"))
+            .status(200)
+            .json(new ApiResponse(200, updatedUser, "Added to watch History"))
 
     } catch (error) {
         throw new ApiError(500, "Error while adding to watch history")
@@ -465,6 +464,102 @@ const getWatchHistory = asyncHandler(async (req, res) => {
         ))
 })
 
+const deleteWatchHistory = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+    const user = await User.findByIdAndUpdate(userId,
+        { watchHistory: [] },
+        { new: true }
+    )
+
+    if (!user) {
+        throw new ApiError(500, "Error while removing watch history")
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, user, "watch history deleted successfully"))
+})
+
+const deleteWatchHistoryById = asyncHandler(async (req, res) => {
+    const { id } = req.body;
+    if (!isValidObjectId(id)) {
+        throw new ApiError(404, 'id is not valid')
+    }
+    try {
+        const user = await User.findOneAndUpdate(
+            { _id: req.user._id },
+            { $pull: { watchHistory: id } },
+            { new: true }
+        )
+
+        if (!user) {
+            throw new ApiError(500, 'Server Error while deleting watch history by id')
+        }
+
+        return res
+        .status(200)
+        .json(new ApiResponse(200, user, 'watch history deleted by id'))
+
+    } catch (error) {
+        throw new ApiError(501, `Error ${error}`)
+    }
+})
+
+const getSearchVideos = asyncHandler(async (req, res) => {
+    const { page = 1, limit = 10, query, sortType, sortBy } = req.query;
+
+    if (!query) {
+        throw new ApiError(404, 'Enter what to search')
+    }
+
+    const user = await User.aggregate([
+        {
+            $match: {
+                _id: new mongoose.Types.ObjectId(req.user._id)
+            }
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "watchHistory",
+                foreignField: "_id",
+                as: "watchHistory",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "owner",
+                            pipeline: [
+                                {
+                                    $project: {
+                                        fullName: 1,
+                                        username: 1,
+                                        avatar: 1
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields: {
+                            owner: {
+                                $first: "$owner"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ])
+
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, user, "Videos retrieved successfully"));
+});
+
 export {
     registerUser,
     loginUser,
@@ -477,5 +572,8 @@ export {
     updateUserCoverImage,
     getUserChannelProfile,
     getWatchHistory,
-    addToWatchHistory
+    addToWatchHistory,
+    deleteWatchHistory,
+    deleteWatchHistoryById,
+    getSearchVideos
 }

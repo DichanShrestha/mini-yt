@@ -6,8 +6,6 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
 import {
     uploadOnCloudinary,
-    deleteFromFs,
-    deleteThumbnailFromCloudinary
 } from "../utils/cloudinary.js"
 import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2"
 
