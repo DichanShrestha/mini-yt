@@ -62,7 +62,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 })
 
 const toggleTweetLike = asyncHandler(async (req, res) => {
-    const { tweetId } = req.params
+    const { tweetId } = req.body
     //TODO: toggle like on tweet
     if (!tweetId) {
         throw new ApiError(400, "cid is not oid")
@@ -72,7 +72,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
         likedBy: req.user._id
     })
     if (likedTweet) {
-        await findByIdAndDelete(likedTweet._id)
+        await Like.findByIdAndDelete(likedTweet._id)
         return res
             .status(200)
             .json(new ApiResponse(200, null, "Unliked tweet"))
@@ -95,40 +95,41 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     //TODO: get all liked videos
     const result = await Like.aggregate([
         {
-          '$match': {
-            'video': {
-              '$exists': true
-            }, 
-            'likedBy': new mongoose.Types.ObjectId(req.user._id)
-          }
-        }, {
-          '$lookup': {
-            'from': 'videos', 
-            'localField': 'video', 
-            'foreignField': '_id', 
-            'as': 'video'
-          }
-        }, {
-          '$addFields': {
-            'video': {
-              '$arrayElemAt': [
-                '$video', 0
-              ]
+            '$match': {
+                'video': {
+                    '$exists': true
+                },
+                'likedBy': new mongoose.Types.ObjectId(req.user._id)
             }
-          }
+        }, {
+            '$lookup': {
+                'from': 'videos',
+                'localField': 'video',
+                'foreignField': '_id',
+                'as': 'video'
+            }
+        }, {
+            '$addFields': {
+                'video': {
+                    '$arrayElemAt': [
+                        '$video', 0
+                    ]
+                }
+            }
         }
-      ])
+    ])
     if (!result) {
         throw new ApiError(500, "Can't find liked videos")
     }
     return res
-    .status(200)
-    .json(new ApiResponse(200, result, "liked videos retrieved"))
+        .status(200)
+        .json(new ApiResponse(200, result, "liked videos retrieved"))
 })
+
 
 export {
     toggleCommentLike,
     toggleTweetLike,
     toggleVideoLike,
-    getLikedVideos
+    getLikedVideos,
 }

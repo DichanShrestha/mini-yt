@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/asyncHandler.js"
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2"
 
 //you need to write a tweet
 const createTweet = asyncHandler(async (req, res) => {
@@ -73,6 +74,13 @@ const getAllTweets = asyncHandler(async (req, res) => {
           ]
         }
       }
+    }, {
+      '$lookup': {
+        'from': 'likes',
+        'localField': '_id',
+        'foreignField': 'tweet',
+        'as': 'tweetLikes'
+      }
     }
   ])
   return res
@@ -106,7 +114,6 @@ const updateTweet = asyncHandler(async (req, res) => {
   }
 });
 
-
 const deleteTweet = asyncHandler(async (req, res) => {
   //TODO: delete tweet
   const { tweetId } = req.body;
@@ -123,10 +130,85 @@ const deleteTweet = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Tweet deleted successfully"))
 })
 
+const searchTweet = asyncHandler(async (req, res) => {
+  const { page = 1, limit = 10, query, sortType, sortBy } = req.query;
+
+  Tweet.schema.plugin(mongooseAggregatePaginate)
+
+  if (!query) {
+    throw new ApiResponse(404, "query not found")
+  }
+
+  const pipeline = [];
+
+  if (query) {
+    pipeline.push({
+      $match: {
+        content: {
+          $regex: query,
+          $options: 'i'
+        }
+      }
+    });
+  }
+
+  if (sortType && sortBy) {
+    let sortOrder = sortType === 'asc' ? 1 : -1;
+    pipeline.push({
+      $sort: {
+        [sortBy]: sortOrder
+      }
+    });
+  }
+
+  pipeline.push({
+    $limit: parseInt(limit)
+  })
+  pipeline.push({
+    $skip: (page - 1) * limit
+  })
+
+  pipeline.push({
+    '$lookup': {
+      'from': 'users',
+      'localField': 'owner',
+      'foreignField': '_id',
+      'as': 'commentUser'
+    }
+  }, {
+    '$addFields': {
+      'commentUser': {
+        '$arrayElemAt': [
+          '$commentUser', 0
+        ]
+      }
+    }
+  }, {
+    '$lookup': {
+      'from': 'likes',
+      'localField': '_id',
+      'foreignField': 'tweet',
+      'as': 'tweetLikes'
+    }
+  })
+
+  const result = await Tweet.aggregate(pipeline);
+
+  if (!result) {
+    throw new ApiResponse(500, "Error at server while searching")
+  }
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, result, "Tweet searched"))
+
+})
+
 export {
   createTweet,
   getUserTweets,
   updateTweet,
   deleteTweet,
-  getAllTweets
+  getAllTweets,
+  searchTweet
 }

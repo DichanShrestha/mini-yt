@@ -12,6 +12,7 @@ function Community() {
   const [user, setUser] = useState("");
   const [commentUser, setCommentUser] = useState([])
   const [tweet, setTweet] = useState("");
+  const [query, setQuery] = useState("")
   useEffect(() => {
     (async () => {
       const response = await useUser();
@@ -31,6 +32,7 @@ function Community() {
       }
     );
     setTweet('')
+    window.location.reload()
   };
 
   useEffect(() => {
@@ -46,17 +48,32 @@ function Community() {
       );
       setCommentUser(response.data.data)
     })()
-  }, [commentUser])
+  }, [])
+  const searchTweet = async () => {
+    const response  = await axios.get(
+      `http://localhost:8000/api/v1/tweets?page=1&limit=10&query=${query}&sortBy=content&sortType=asc`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+    setCommentUser(response.data.data)
+  };
 
   return (
     <div className="relative">
       <Navbar />
       <Sidebar />
-      <div className="absolute top-20 right-8 ">
+      <div className="absolute top-20 right-8 flex">
         <Input
           className="w-96 rounded-2xl border-0 bg-gray-300 pl-4 text-gray-500"
           placeholder="Search Community"
+          value={query}
+          onChange= {e => setQuery(e.target.value)}
         />
+        <Button className="bg-gray-300 rounded-2xl hover:bg-gray-200 ml-1" onClick={searchTweet}>Search</Button>
       </div>
 
       <div className="absolute top-36 left-64 w-3/5 ">

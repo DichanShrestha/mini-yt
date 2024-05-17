@@ -34,6 +34,7 @@ function Template({ commentUser }) {
       return Math.floor(timeInSec / 31104000) + "years";
     }
   };
+  // console.log(commentUser);
 
   useEffect(() => {
     (async () => {
@@ -58,7 +59,7 @@ function Template({ commentUser }) {
   const handleDeleteTweet = async (tweetId) => {
     await axios.patch(
       "http://localhost:8000/api/v1/tweets/delete",
-      {tweetId},
+      { tweetId },
       {
         headers: {
           "Content-Type": "application/json",
@@ -66,7 +67,21 @@ function Template({ commentUser }) {
         withCredentials: true,
       }
     );
+    window.location.reload()
   };
+
+  const toggleTweetLike = async (tweetId) => {
+    await axios.post("http://localhost:8000/api/v1/like/toggle/t",
+      {tweetId},
+      {
+        headers:{
+          "Content-Type": "application/json"
+        },
+        withCredentials: true
+      }
+    )
+    window.location.reload()
+  }
 
   return (
     <>
@@ -80,14 +95,14 @@ function Template({ commentUser }) {
             key={index}
             className="relative flex border border-gray-400 gap-3 mb-1"
           >
-            <div>
+            <div className="mt-1">
               <Avatar>
                 <AvatarImage src={item.commentUser.avatar} />
                 <AvatarFallback>avatar</AvatarFallback>
               </Avatar>
             </div>
             <div>
-              <div>
+              <div className="mb-2 mt-1">
                 <span className="font-bold mr-2">
                   {item.commentUser.username}
                 </span>
@@ -101,6 +116,12 @@ function Template({ commentUser }) {
               </div>
               <div>
                 <p>{item.content}</p>
+                <div className="flex my-1">
+                  <span>{item.tweetLikes.length}</span>
+                  <span 
+                  onClick={() => toggleTweetLike(item._id)}
+                  className="ml-1 cursor-pointer material-symbols-outlined">favorite</span>
+                </div>
               </div>
             </div>
             {item.owner === userId && (
@@ -120,9 +141,10 @@ function Template({ commentUser }) {
                     </Button>
                   </DialogContent>
                 </Dialog>
-                <Button 
-                onClick={() => handleDeleteTweet(item._id)}
-                className="bg-gray-300 p-2 rounded-2xl h-6 hover:bg-gray-200 absolute right-0 top-1">
+                <Button
+                  onClick={() => handleDeleteTweet(item._id)}
+                  className="bg-gray-300 p-2 rounded-2xl h-6 hover:bg-gray-200 absolute right-0 top-1"
+                >
                   Delete
                 </Button>
               </div>
