@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 const app = express();
 
 app.use(cors({ //allows browser to accept my backend server
-    origin: 'http://localhost:5173',
+    origin: 'http://www.miniyt8.com/',
     credentials: true
 }))
 app.use(express.json({ limit: '16kb' })) // sets a limit of 16kb of json at a time so that my server doesn't crashes.
